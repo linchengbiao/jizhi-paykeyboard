@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 0x1a86 / 0x7523: Qinheng CH340 -->
+    <usb-device vendor-id="6790" product-id="29987" />
+</resources>
