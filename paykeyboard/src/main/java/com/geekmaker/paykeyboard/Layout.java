@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Layout {
-    private static String[] layoutSettings = new String[]{"1:5,2:4,3:9,4:8,5:7,6:-,7:/,8:*,9:0,12:REFUND,13:=,14:3,15:2,16:6,19:.,20:+,31:1,21:ESC,23:PAY,28:Backspace,29:OPT,30:LIST", "1:5,2:4,3:9,4:8,5:7,6:-,7:/,8:*,9:0,12:REFUND,13:=,14:3,15:2,16:6,19:.,20:Backspace,31:1,21:+,23:PAY,28:LIST,29:OPT,30:ESC"};
+    private static String[] layoutSettings = new String[]{"1:5,2:4,3:9,4:8,5:7,6:-,7:/,8:*,9:0,12:REFUND,13:=,14:3,15:2,16:6,19:.,20:+,31:1,21:ESC,22:FACE,23:PAY,28:Backspace,29:OPT,30:LIST", "1:5,2:4,3:9,4:8,5:7,6:-,7:/,8:*,9:0,12:REFUND,13:=,14:3,15:2,16:6,19:.,20:Backspace,31:1,21:+,22:FACE,23:PAY,28:LIST,29:OPT,30:ESC"};
 
     public Layout() {
     }

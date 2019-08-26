@@ -78,6 +78,7 @@ public class PayKeyboard implements Listener {
     public static final String KEY_OPT = "OPT";
     public static final String KEY_LIST = "LIST";
     public static final String KEY_DOT = ".";
+    public static final String KEY_FACE_PAY = "FACE";
     private boolean released = false;
     private PayKeyboard.RetryTask lastUpdateTask;
     private String lastTip = null;
