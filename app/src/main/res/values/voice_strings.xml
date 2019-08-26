@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="voice_setting">请点击屏幕开始设置</string>
+    <string name="voice_setting_paytype">请设置收银模式</string>
+</resources>

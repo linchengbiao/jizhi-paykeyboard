@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:layout_gravity="center"
+    android:background="@color/transparent"
+    >
+
+
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/ll_scan_confirm"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/view_corner_up"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="确定重置收银模式"
+            android:id="@+id/tv_title"
+            android:textStyle="bold"
+            android:layout_marginTop="15dp"
+            android:textColor="@color/f8_wx_grey_alpha"
+            android:textSize="16sp"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_horizontal"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="将自动清除当前缓存信息，你将重新选择收银模式。"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/f8_wx_grey_alpha"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:textSize="14sp"
+            />
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/f8_pre_setting_line"
+        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/view_corner_down"
+        android:layout_gravity="center"
+        android:id="@+id/ll_scan_cancel"
+        android:gravity="center"
+        >
+       <TextView
+           android:layout_width="0dp"
+           android:layout_height="match_parent"
+           android:layout_weight="1"
+           android:text="取消"
+           android:id="@+id/tv_cancel"
+           android:textColor="@color/f8_wx_grey_alpha"
+           android:gravity="center"
+           android:textSize="16sp"
+           android:layout_gravity="center"
+           android:background="@drawable/view_corner_down_left"
+           />
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/f8_pre_setting_line"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="确认"
+            android:id="@+id/tv_confirm"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:background="@drawable/view_corner_down_right"
+            android:layout_gravity="center"
+            android:textColor="@color/f8_wx_green"
+            />
+    </LinearLayout>
+
+
+</LinearLayout>

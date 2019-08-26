@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="@color/light_blue"
+    tools:context="com.android.landicorp.f8face.activity.ShowQrcodeActivity">
+
+    <include layout="@layout/view_title"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center"
+        android:textColor="@color/white"
+        android:layout_marginTop="@dimen/margin_top_dp"
+        android:text="@string/title_pay_amount"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/margin_top_dp"
+        android:text="$6.66"
+        android:textSize="@dimen/activity_font_size_big"
+        android:textColor="@color/orange"
+        />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/view_corner_all"
+        android:id="@+id/ll_qrcode"
+        android:layout_marginTop="@dimen/margin_top_dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_scan_pay_tips"
+            android:textColor="@color/black"
+
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/iv_qrcode"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_mima"
+            />
+    </RelativeLayout>
+</LinearLayout>

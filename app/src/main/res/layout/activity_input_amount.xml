@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    tools:context="com.android.landicorp.f8face.activity.InputPinActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/ll_main"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/rl_top"
+            android:background="@drawable/bg_input_amount"
+            android:layout_weight="1"
+            >
+            <include layout="@layout/view_toolbar"
+                android:id="@+id/toolbar"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:id="@+id/line"
+                android:layout_marginTop="15dp"
+                android:layout_below="@+id/toolbar"
+                android:background="@color/div_line_color"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:id="@+id/tv_title"
+                android:gravity="center_vertical|left"
+                android:textColor="#21000000"
+                android:layout_marginTop="25dp"
+                android:text="@string/title_sale_amount_tips"
+                android:textSize="36sp"
+                android:layout_below="@+id/line"
+                />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/rl_body"
+            android:layout_weight="3"
+            android:background="@color/white"
+            >
+
+            <com.android.landicorp.f8face.view.ClearEditText
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:id="@+id/clear_et_pin"
+                android:drawableLeft="@drawable/ic_cell_yuan"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:inputType="numberPassword"
+                android:drawablePadding="5dp"
+                android:background="@null"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:id="@+id/tv_line"
+                android:background="@color/f8_btn_end_color"
+                android:layout_marginLeft="50dp"
+                android:layout_alignRight="@+id/clear_et_pin"
+                android:layout_below="@+id/clear_et_pin"
+                />
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignLeft="@+id/clear_et_pin"
+                android:layout_alignRight="@+id/clear_et_pin"
+                android:layout_below="@+id/tv_line"
+                android:layout_marginTop="10dp">
+
+
+                <Button
+                    android:id="@+id/btn_one"
+                    style="@style/activity_input_amount_button"
+                    android:text="1"
+                    app:layout_constraintBottom_toTopOf="@+id/btn_four"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/btn_two"
+                    style="@style/activity_input_amount_button"
+
+                    android:text="2"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/btn_one" />
+
+                <Button
+                    android:id="@+id/btn_three"
+                    style="@style/activity_input_amount_button"
+                    android:text="3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/btn_one" />
+
+                <Button
+                    android:id="@+id/btn_four"
+                    style="@style/activity_input_amount_button"
+                    android:text="4"
+                    app:layout_constraintBottom_toTopOf="@+id/btn_serven"
+                    app:layout_constraintStart_toStartOf="@+id/btn_one"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_one" />
+
+                <Button
+                    android:id="@+id/btn_five"
+                    style="@style/activity_input_amount_button"
+                    android:text="5"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/btn_four" />
+
+                <Button
+                    android:id="@+id/btn_six"
+                    style="@style/activity_input_amount_button"
+                    android:text="6"
+                    app:layout_constraintEnd_toEndOf="@+id/btn_three"
+                    app:layout_constraintTop_toTopOf="@+id/btn_four" />
+
+                <Button
+                    android:id="@+id/btn_serven"
+                    style="@style/activity_input_amount_button"
+                    android:text="7"
+                    app:layout_constraintBottom_toTopOf="@+id/btn_dot"
+                    app:layout_constraintStart_toStartOf="@+id/btn_four"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_four" />
+
+                <Button
+                    android:id="@+id/btn_eight"
+                    style="@style/activity_input_amount_button"
+                    android:text="8"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/btn_serven" />
+
+                <Button
+                    android:id="@+id/btn_nine"
+                    style="@style/activity_input_amount_button"
+                    android:text="9"
+                    app:layout_constraintEnd_toEndOf="@+id/btn_six"
+                    app:layout_constraintTop_toTopOf="@+id/btn_serven" />
+
+                <Button
+                    android:id="@+id/btn_dot"
+                    style="@style/activity_input_amount_button"
+                    android:text="."
+                    app:layout_constraintBottom_toTopOf="@+id/btn_confirm"
+                    app:layout_constraintStart_toStartOf="@+id/btn_serven"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_serven" />
+
+                <Button
+                    android:id="@+id/btn_zero"
+                    style="@style/activity_input_amount_button"
+                    android:text="0"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/btn_dot" />
+
+                <LinearLayout
+                    android:id="@+id/btn_clear"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="@drawable/btn_color_shape_number"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="@+id/btn_zero"
+                    app:layout_constraintEnd_toEndOf="@+id/btn_nine"
+                    app:layout_constraintStart_toStartOf="@+id/btn_nine"
+                    app:layout_constraintTop_toTopOf="@+id/btn_dot">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_backspace" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_confirm"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/btn_color_shape_amount"
+                    android:text="@string/title_confir_pay"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/activity_font_size_big"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_dot" />
+            </android.support.constraint.ConstraintLayout>
+        </RelativeLayout>
+    </LinearLayout>
+
+</FrameLayout>
+

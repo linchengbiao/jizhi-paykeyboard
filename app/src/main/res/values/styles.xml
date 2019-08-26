@@ -1,0 +1,67 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/f8_wx_green</item>
+        <item name="colorPrimaryDark">@color/f8_wx_green</item>
+        <item name="colorAccent">@color/f8_wx_green</item>
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
+
+
+    <style name="baseview">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+    </style>
+
+    <style name="activity_pin_textview" parent="baseview">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/activity_font_size_normal</item>
+    </style>
+
+
+    <style name="activity_input_amount_button" parent="baseview">
+        <item name="android:background">@drawable/btn_color_shape_number</item>
+        <item name="android:textColor">@color/f8_input_amount_button</item>
+        <item name="android:elevation">@dimen/elevation_dp</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="activity_result_succ" parent="baseview">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/f8_edittext_value</item>
+        <item name="android:layout_alignParentLeft">true</item>
+    </style>
+
+    <style name="activity_result_value_succ" parent="baseview">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/f8_result_value</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_marginTop">10dp</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="transparent_dialog_style" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:windowNoTitle">true</item><!--无标题-->
+        <item name="android:windowIsTranslucent">false</item><!--半透明-->
+        <item name="android:windowIsFloating">true</item><!--是否浮现在activity之上-->
+        <item name="android:backgroundDimEnabled">true</item><!--对话框背景变暗-->
+    </style>
+    <style name="SpotsDialogDefault" parent="transparent_dialog_style">
+        <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="DialogTitleText">Loading…</item>
+        <item name="DialogSpotCount">5</item>
+    </style>
+</resources>

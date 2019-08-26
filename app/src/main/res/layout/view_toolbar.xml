@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.landicorp.f8face.view.F8ToolBarView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/about_me_toolbar"
+    android:layout_width="match_parent"
+    android:fitsSystemWindows="true"
+    android:layout_height="?attr/actionBarSize">
+
+</com.android.landicorp.f8face.view.F8ToolBarView>

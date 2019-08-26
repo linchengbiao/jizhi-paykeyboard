@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transition xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="@color/f8_wx_green"/>
+            <corners android:radius="4dp"/>
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="@color/f8_wx_green"/>
+            <corners android:radius="4dp"/>
+        </shape>
+    </item>
+</transition>

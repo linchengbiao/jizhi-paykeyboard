@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/f8_bg_color"
+    android:fitsSystemWindows="true"
+    tools:context="com.android.landicorp.f8face.activity.F8WaitForResultActivity">
+
+
+    <com.android.landicorp.f8face.view.F8ToolBarView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/toolbar"
+        />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_clock_fill"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center_horizontal"
+        />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:id="@+id/tv_wait_info"
+        android:textSize="18sp"
+        android:textColor="@color/f8_wx_green"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/tips_wait_result"
+        />
+
+</LinearLayout>

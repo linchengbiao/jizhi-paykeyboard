@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/f8_wx_green"
+    tools:context="com.android.landicorp.f8face.activity.testActivity">
+
+
+
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@color/red"
+        android:hint="11111"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:hint="22222"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="登录"
+        android:layout_marginTop="20dp"
+        android:id="@+id/btn_confirm"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="textview1"
+        android:layout_marginTop="20dp"
+        android:background="@color/red"
+        android:id="@+id/tv_1"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:text="textview2"
+        android:background="@color/red"
+        android:layout_marginTop="20dp"
+        android:id="@+id/tv_2"
+
+        />
+</LinearLayout>

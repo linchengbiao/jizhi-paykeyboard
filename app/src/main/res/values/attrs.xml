@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="textFieldStyle" format="reference"/>
+    <declare-styleable name="ClearEditText">
+        <attr name="clearIcon" format="reference"/>
+        <attr name="scaleSize" format="float"/>
+        <attr name="drawableWidth" format="dimension"/>
+    </declare-styleable>
+
+    <attr name="borderRadius" format="dimension"/>
+    <!--圆形图片和带有圆角的图片-->
+    <attr name="type" format="reference">
+        <enum name="circle" value="0"/>
+        <enum name="round" value="1"/>
+    </attr>
+    <declare-styleable name="roundImageViewAttrs">
+        <!--直接引用上面的-->
+        <attr name="borderRadius"/>
+        <attr name="type"/>
+    </declare-styleable>
+
+    <declare-styleable name="Dialog">
+        <attr name="DialogTitleAppearance" format="reference" />
+        <attr name="DialogTitleText" format="reference|string" />
+        <attr name="DialogSpotColor" format="reference|color"/>
+        <attr name="DialogSpotCount" format="integer"/>
+    </declare-styleable>
+
+    <declare-styleable name="PreferenceStyle">
+        <attr name="Title" format="string"></attr>
+        <attr name="Value" format="string"></attr>
+        <attr name="DividerColor" format="color"></attr>
+        <attr name="summary" format="string"></attr>
+        <attr name="src" format="reference"></attr>
+        <attr name="showSwitch" format="boolean"/>
+        <attr name="Height" format="dimension"/>
+        <attr name="LineVisible" format="boolean"/>
+        <attr name="showCheckBox" format="boolean"></attr>
+    </declare-styleable>
+</resources>

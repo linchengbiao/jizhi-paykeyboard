@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:preference="http://schemas.android.com/apk/res/com.android.landicorp.f8face"
+    android:title="PreferenceScreen">
+    <com.android.landicorp.f8face.view.CusPreferenceCatView
+        android:key="key_prerence_top"
+        preference:Title="@string/pre_net_setting"
+       >
+        <com.android.landicorp.f8face.view.CusPreferenceWithArrowView
+            android:title="Preference"
+            android:key="@string/key_pre_wifi"
+            preference:Title="@string/pre_net_wifi"
+            preference:Value="已连接"
+            preference:src="@drawable/ic_system_arrow_right"
+            />
+
+        <com.android.landicorp.f8face.view.CusPreferenceWithArrowView
+            android:title="Preference"
+            android:key="@string/key_pre_line"
+            preference:Title="@string/pre_net_line"
+            preference:Value="已连接"
+            preference:src="@drawable/ic_system_arrow_right"
+            />
+        <com.android.landicorp.f8face.view.CusPreferenceSwitch
+            android:title="Preference"
+            android:key="@string/key_pre_mobile"
+            preference:Title="@string/pre_net_4g"
+            preference:Value=""
+            />
+    </com.android.landicorp.f8face.view.CusPreferenceCatView>
+
+    <com.android.landicorp.f8face.view.CusPreferenceCatView
+        android:key="key_prerence_bottom"
+        preference:Title="@string/pre_pay_setting"
+        android:title="@string/pre_pay_setting">
+
+        <com.android.landicorp.f8face.view.CusPreferenceCheckBox
+            android:key="@string/key_pre_pay_self"
+            preference:Title="@string/pre_pay_self"
+            preference:Value=""
+            android:checked="true"
+            preference:summary="@string/pre_pay_self_tips"
+            />
+        <com.android.landicorp.f8face.view.CusPreferenceCheckBox
+            android:key="@string/key_pre_pay_saler"
+            preference:Value=""
+            preference:src="@null"
+            preference:Title="@string/pre_pay_cashier"
+            preference:summary="@string/pre_pay_cashier_tips"
+            />
+
+    </com.android.landicorp.f8face.view.CusPreferenceCatView>
+</PreferenceScreen>

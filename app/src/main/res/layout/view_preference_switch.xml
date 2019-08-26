@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:background="@color/white"
+    >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="16dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="123123123"
+            android:textSize="16sp"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/tv_pre_title"
+            android:textColor="@color/f8_pre_setting_title"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:id="@+id/tv_pre_summary"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:textColor="@color/f8_pre_setting_value3"
+            />
+    </LinearLayout>
+
+   <LinearLayout
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:orientation="horizontal"
+       android:id="@+id/ll_right"
+       android:layout_centerVertical="true"
+       android:layout_marginRight="16dp"
+       android:layout_alignParentRight="true"
+       >
+    <include layout="@layout/preference_widget_switch"/>
+   </LinearLayout>
+
+  
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@color/f8_pre_setting_line"
+        android:layout_alignParentBottom="true"
+        />
+
+</RelativeLayout>

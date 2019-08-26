@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@drawable/shape_progress_dialog_bg"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="80dp"
+        android:src="@drawable/paying"
+        android:layout_gravity="center"
+        android:layout_marginTop="32dp"
+        />
+    <TextView
+        android:id="@+id/dmax_spots_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:textSize="24sp"
+        android:visibility="gone"
+        android:textColor="@color/white"
+        android:text="云闪付"/>
+
+    <com.android.landicorp.f8face.view.ProgressLayout
+        android:id="@+id/dmax_spots_progress"
+        android:layout_width="@dimen/progress_width"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/progress_margin"/>
+
+</LinearLayout>

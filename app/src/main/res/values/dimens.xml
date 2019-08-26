@@ -1,0 +1,27 @@
+<resources>
+    <dimen name="spot_size">6dp</dimen>
+    <dimen name="title_margin">10dp</dimen>
+    <dimen name="title_padding">6dp</dimen>
+    <dimen name="progress_margin">24dp</dimen>
+    <dimen name="progress_width">250dp</dimen>
+
+    <dimen name="activity_horizontal_margin">17dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="ui_10_dip">10dip</dimen>
+    <dimen name="size_table_text">14dip</dimen>
+
+
+    <dimen name="normal_corner_dp">4dp</dimen>
+    <dimen name="elevation_dp">1dp</dimen>
+    <dimen name="btn_height">55dp</dimen>
+
+    <dimen name="size_conrnel_dp">20dp</dimen>
+    <dimen name="margin_left_dp">15dp</dimen>
+    <dimen name="margin_right_dp">15dp</dimen>
+    <dimen name="margin_top_dp">15dp</dimen>
+
+    <dimen name="activity_font_size_big">18sp</dimen>
+    <dimen name="activity_font_size_normal">12sp</dimen>
+    <dimen name="activity_font_size_small">10sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+</resources>

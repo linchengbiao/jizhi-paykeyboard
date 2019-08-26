@@ -1,0 +1,83 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "com.android.landicorp.f8face"
+        minSdkVersion 18
+        targetSdkVersion 27
+        versionCode 2
+        versionName "2.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == 'com.android.support') {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion '27.1.1'
+            }
+        }
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation('com.serenegiant:common:2.12.4') {
+        exclude module: 'support-v4'
+    }
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.android.support:design:27.1.1'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    //设置view阴影
+    implementation 'com.yinglan.shadowimageview:shadowimageview:1.0.4'
+    implementation files('libs/zxing_core_3.4.0.jar')
+    implementation(name: 'libuvccamera-release', ext: 'aar')
+    //解码库
+    implementation files('libs/ScanDecoder_v1.2.1.0108.jar')
+    //图片轮播
+    //    implementation 'com.panxw.imageindicator:library:1.0.2'
+    implementation 'com.youth.banner:banner:1.4.10'
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    //    implementation 'com.facebook.fresco:fresco:0.12.0'
+    //
+    //    //设置系统字体
+    //    implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
+    implementation files('libs/landi_face_api_aidl_19032701.jar')
+    implementation(name: 'wxfacepay-release', ext: 'aar')
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation files('libs/com.baidu.tts_2.3.2.20180713_6101c2a.jar')
+    //文字textview跳动
+    implementation 'net.frakbot:jumpingbeans:1.3.0'
+    //    //仿微信图片选择器
+    //    implementation 'com.lqr.imagepicker:library:1.0.0'
+    //    implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    implementation files('libs/eptapilibrary-2.4.2.jar')
+    implementation(name: 'paykeyboard-release', ext: 'aar')
+    //    implementation project(':paykeyboard')
+    implementation files('libs/ImiSDK.jar')
+}

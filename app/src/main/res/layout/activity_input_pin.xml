@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:background="@color/f8_btn_end_color"
+    tools:context="com.android.landicorp.f8face.activity.InputPinActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/ll_main"
+        >
+        <include layout="@layout/view_toolbar"
+            android:id="@+id/toolbar"
+            />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/rl_top"
+            android:layout_weight="1"
+            >
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="60dp"
+                android:minHeight="60dp"
+                android:orientation="horizontal"
+                android:id="@+id/ll_face"
+                android:layout_marginLeft="10dp"
+                android:layout_centerVertical="true"
+                >
+                <com.android.landicorp.f8face.view.RoundImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/iv_face_logo"
+                    android:layout_gravity="center"
+                    app:type="circle"
+                    />
+            </LinearLayout>
+            <TextView
+                style="@style/activity_pin_textview"
+                android:layout_marginLeft="15dp"
+                android:id="@+id/tv_title"
+                android:text="@string/tips_input_pin"
+                android:textSize="24sp"
+                android:layout_marginTop="-10dp"
+                android:layout_alignTop="@+id/ll_face"
+                android:layout_toRightOf="@+id/ll_face"
+                />
+            <TextView
+                style="@style/activity_pin_textview"
+                android:id="@+id/tv_tips"
+                android:textSize="12sp"
+                android:textColor="@color/f8_input_pin_tips"
+                android:layout_marginTop="5dp"
+                android:layout_below="@+id/tv_title"
+                android:layout_alignLeft="@+id/tv_title"
+                android:text="@string/title_input_pin"
+                />
+
+        </RelativeLayout>
+        <com.android.landicorp.f8face.view.AmountKeyBoard
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/rl_body"
+            android:layout_weight="3"
+            >
+        </com.android.landicorp.f8face.view.AmountKeyBoard>
+
+    </LinearLayout>
+
+    <com.android.landicorp.f8face.view.RoundImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/iv_face"
+        android:layout_gravity="center"
+        app:type="circle"
+        />
+</FrameLayout>
+

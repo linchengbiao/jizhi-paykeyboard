@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:preference="http://schemas.android.com/apk/res/com.android.landicorp.f8face"
+    android:title="PreferenceScreen">
+    <com.android.landicorp.f8face.view.CusPreferenceWithArrowView
+        android:title="Preference"
+        android:key="@string/key_wx_pre1"
+        preference:Title="@string/title_wx_setting1"
+        preference:Value=""
+        preference:src="@drawable/ic_system_arrow_right"
+        />
+
+    <com.android.landicorp.f8face.view.CusPreferenceWithArrowView
+        android:title="Preference"
+        android:key="@string/key_wx_pre2"
+        preference:Title="@string/title_wx_setting2"
+        preference:Value="独立收银模式"
+        preference:src="@drawable/ic_system_arrow_right"
+        />
+    <com.android.landicorp.f8face.view.CusPreferenceWithArrowView
+        android:title="Preference"
+        android:key="@string/key_wx_pre3"
+        preference:Title="@string/title_wx_setting3"
+        preference:Value=""
+        preference:LineVisible="false"
+        preference:src="@drawable/ic_system_arrow_right"
+        />
+
+    <com.android.landicorp.f8face.view.CusPreferenceCatView
+        preference:Height="10dp"
+        >
+
+        <com.android.landicorp.f8face.view.CusPreferenceWithArrowView
+            android:title="Preference"
+            android:key="@string/key_wx_pre4"
+            preference:Title="@string/title_wx_setting4"
+            preference:Value=""
+            preference:LineVisible="false"
+            preference:src="@drawable/ic_system_arrow_right"
+            />
+
+    </com.android.landicorp.f8face.view.CusPreferenceCatView>
+    <com.android.landicorp.f8face.view.CusPreferenceCatView
+        preference:Height="2dp"
+        >
+    </com.android.landicorp.f8face.view.CusPreferenceCatView>
+</PreferenceScreen>

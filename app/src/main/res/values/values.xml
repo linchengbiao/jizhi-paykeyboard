@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key_pre_wifi">key_pre_wifi</string>
+    <string name="key_pre_mobile">key_pre_mobile</string>
+    <string name="key_pre_line">key_pre_line</string>
+    <string name="key_pre_pay_self">key_pre_pay_self</string>
+    <string name="key_pre_pay_saler">key_pre_pay_saler</string>
+
+    <string name="key_wx_pre1">key_wx_pre1</string>
+    <string name="key_wx_pre2">key_wx_pre2</string>
+    <string name="key_wx_pre3">key_wx_pre3</string>
+    <string name="key_wx_pre4">key_wx_pre4</string>
+
+</resources>
