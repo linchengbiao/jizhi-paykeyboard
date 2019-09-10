@@ -2,6 +2,10 @@ package com.android.landicorp.f8face.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
@@ -10,13 +14,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.landicorp.f8face.IMI.DecodePanel;
+import com.android.landicorp.f8face.IMI.GLPanel;
 import com.android.landicorp.f8face.R;
 import com.android.landicorp.f8face.inter.KeyBoardCancelMessageEvent;
+import com.android.landicorp.f8face.inter.WxFacePayMessageEvent;
 import com.android.landicorp.f8face.util.FullScreen;
+import com.hjimi.api.iminect.ImiDevice;
+import com.hjimi.api.iminect.ImiNect;
+import com.tencent.wxpayface.IWxPayfaceCallback;
+import com.tencent.wxpayface.WxPayFace;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.Map;
 
 public class F8ShowAmountActivity extends F8BaseCameraActivity implements View.OnClickListener{
     private TextView tvAmount;
@@ -34,6 +47,31 @@ public class F8ShowAmountActivity extends F8BaseCameraActivity implements View.O
         scanLayout.setOnClickListener(this);
         faceScanLayout = (FrameLayout)findViewById(R.id.ll_face_scan);
         faceScanLayout.setOnClickListener(this);
+
+        mUVCCameraView = (SurfaceView)findViewById(R.id.camera_surface_view);
+        mGLPanel = (GLPanel) findViewById(R.id.sv_color_view);
+        ImiNect.initialize();
+        mDevice = ImiDevice.getInstance();
+        mainlistener = new MainListener();
+        mUVCCameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder surfaceHolder) {
+                mSurface = surfaceHolder.getSurface();
+                mDecodePanel = new DecodePanel();
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+                mDecodePanel.stopDecoder();
+            }
+        });
+
+
     }
     @Override
     protected void onStart() {
@@ -48,10 +86,56 @@ public class F8ShowAmountActivity extends F8BaseCameraActivity implements View.O
         amount = getIntent().getStringExtra("Amount");
         speak("请支付"+String.valueOf(amount)+"元，点击开始刷脸付。");
         tvAmount.setText(getString(R.string.yuan)+" "+String.valueOf(amount)+"元");
-        scanLayout.setVisibility(View.GONE);
+        scanLayout.setVisibility(View.VISIBLE);
+        WxPayFace.getInstance().startCodeScanner(new IWxPayfaceCallback() {
+            @Override
+            public void response(Map info) throws RemoteException {
+                if (info != null){
+                    String return_code = (String) info.get("return_code");
+                    String return_msg = (String) info.get("return_msg");
+                    String code_msg = (String) info.get("code_msg");
+                    final String resultString = "startCodeScanner, return_code : " + return_code + " return_msg : " + return_msg + " code_msg: " + code_msg;
+                    if (return_code.equals("SUCCESS")){
+                       runOnUiThread(new Runnable() {
+                           @Override
+                           public void run() {
+                               speak("扫码成功");
+                               handler.sendEmptyMessage(MSG_DO_STOP_SCAN);
+                               onTradeSucc();
+                               if (isPayByHID){
+                                   sendDataByHID(code_msg);
+                                   handler.sendEmptyMessage(MSG_DO_START_SCAN);
+                                   Intent mIntent = new Intent(F8ShowAmountActivity.this,F8WaitForResultActivity.class);
+                                   mIntent.putExtra("Amount",amount);
+                                   startActivity(mIntent);
+                               }else{
+                                   Intent intent = new Intent(F8ShowAmountActivity.this,ResultSuccActivity.class);
+                                   intent.putExtra("Amount",amount);
+                                   startActivity(intent);
+                                   finish();
+                               }
+                           }
+                       });
+
+                    }
+                }
+            }
+        });
+        isCanScan = true;
+        Log.d("lincb","onResume");
+//        new Handler().postDelayed(new MainScanActivity.OpenDeviceRunnable(),500);
+//        if(mViewer != null){
+//            mViewer.onResume();
+//        }
     }
 
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("lincb","onPause");
+        releaseScanCamera();
+    }
     @Override
     protected synchronized void onStop() {
         super.onStop();
@@ -67,13 +151,7 @@ public class F8ShowAmountActivity extends F8BaseCameraActivity implements View.O
             case R.id.ll_face_scan:
                 //调用人脸支付库
                 setFaceMode();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        doWxFacePay(amount);
-//                        goSettingPage();
-                    }
-                },100);
+                doWxFacePay(amount);
 
                 break;
         }
@@ -87,6 +165,16 @@ public class F8ShowAmountActivity extends F8BaseCameraActivity implements View.O
     }
 
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(WxFacePayMessageEvent event) {
+        setFaceMode();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doWxFacePay(amount);
+            }
+        },100);
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(KeyBoardCancelMessageEvent event) {

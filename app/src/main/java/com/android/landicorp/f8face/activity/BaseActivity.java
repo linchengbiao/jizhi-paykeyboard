@@ -29,6 +29,8 @@ public class BaseActivity extends AppCompatActivity implements TradeStatusInter{
     private F8Application f8Application;
     protected F8ToolBarView toolbar;
     private MySyntherizer mySyntherizer;
+    protected SharedPreferences preference;
+    protected SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,8 @@ public class BaseActivity extends AppCompatActivity implements TradeStatusInter{
         payKeyboard = f8Application.getPayKeyboard();
         mySyntherizer = f8Application.getSynthesizer();
         //获取设置界面数据
-        SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(this);
+        preference = PreferenceManager.getDefaultSharedPreferences(this);
+        editor = preference.edit();
         isPayBySaler = preference.getBoolean(getString(R.string.key_pre_pay_saler),false);
         isPayByHID = preference.getBoolean(getString(R.string.key_pre_pay_self),true);
     }

@@ -43,6 +43,22 @@
             />
 
     </com.android.landicorp.f8face.view.CusPreferenceCatView>
+
+    <com.android.landicorp.f8face.view.CusPreferenceCatView
+        preference:Height="10dp"
+        >
+
+        <com.android.landicorp.f8face.view.CusPreferenceWithArrowView
+            android:title="Preference"
+            android:key="@string/key_wx_pre5"
+            preference:Title="蓝牙HID设置"
+            preference:Value=""
+            preference:LineVisible="false"
+            preference:src="@drawable/ic_system_arrow_right"
+            />
+
+    </com.android.landicorp.f8face.view.CusPreferenceCatView>
+
     <com.android.landicorp.f8face.view.CusPreferenceCatView
         preference:Height="2dp"
         >

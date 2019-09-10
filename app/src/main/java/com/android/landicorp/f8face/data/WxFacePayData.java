@@ -5,11 +5,12 @@ package com.android.landicorp.f8face.data;
  */
 
 public class WxFacePayData {
-    public final static String WECHAT_APP_ID_TEST="wxc6bcbc59e5e5eb98";
-    public final static String WECHAT_MCH_ID_TEST="1494369602";//商户号
+    public final static String WECHAT_APP_ID_TEST="wx2b029c08a6232582";
+    public final static String WECHAT_MCH_ID_TEST="1900007081";//商户号
     public final static String WECHAT_STORE_ID_TEST = "12345";//门店号
     public final static String WECHAT_API_KEY_TEST="e10adc3849ba56abbe56e056f20f883e";
 
+    public static final String RETURN_ERROR = "ERROR";
 
     public static final String RETURN_CODE = "return_code";
     public static final String RETURN_SUCCESS = "SUCCESS";

@@ -15,6 +15,8 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
     <application
         android:name=".F8Application"
@@ -26,8 +28,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainScanActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            >
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,13 +51,13 @@
             android:name=".activity.WelcomeActivity"
             android:configChanges="keyboardHidden|screenSize|orientation"
             android:windowSoftInputMode="stateHidden|adjustUnspecified" />
-        <!--<activity-->
-            <!--android:name=".activity.BaseActivity"-->
-            <!--android:configChanges="keyboardHidden|screenSize|orientation"-->
-            <!--android:label="@string/title_activity_base"-->
-            <!--android:screenOrientation="portrait"-->
-            <!--android:theme="@style/AppTheme.NoActionBar"-->
-            <!--android:windowSoftInputMode="stateHidden|adjustUnspecified" />-->
+        <!-- <activity -->
+        <!-- android:name=".activity.BaseActivity" -->
+        <!-- android:configChanges="keyboardHidden|screenSize|orientation" -->
+        <!-- android:label="@string/title_activity_base" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- android:theme="@style/AppTheme.NoActionBar" -->
+        <!-- android:windowSoftInputMode="stateHidden|adjustUnspecified" /> -->
         <activity
             android:name=".activity.ResultSuccActivity"
             android:configChanges="keyboardHidden|screenSize|orientation"
@@ -91,10 +92,10 @@
             android:name=".activity.F8WxCurrentPayTypeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:windowSoftInputMode="stateHidden|adjustUnspecified" />
-
         <activity android:name=".activity.F8WaitForResultActivity" />
         <activity android:name=".activity.WebViewActivity" />
-        <activity android:name=".activity.ShowADImageActivity"></activity>
+        <activity android:name=".activity.ShowADImageActivity" />
+        <activity android:name=".activity.ChooseBluActivity"/>
     </application>
 
 </manifest>

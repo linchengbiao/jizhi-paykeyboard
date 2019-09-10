@@ -29,6 +29,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.landicorp.f8face.F8Application;
+import com.android.landicorp.f8face.IMI.DecodePanel;
+import com.android.landicorp.f8face.IMI.GLPanel;
+import com.android.landicorp.f8face.IMI.LdBitmapFactory;
+import com.android.landicorp.f8face.IMI.SimpleViewer;
 import com.android.landicorp.f8face.R;
 import com.android.landicorp.f8face.baidu.controller.MySyntherizer;
 import com.android.landicorp.f8face.data.WxFacePayData;
@@ -40,6 +44,13 @@ import com.android.landicorp.f8face.util.ToastUtil;
 import com.android.landicorp.f8face.view.SpotsDialog;
 import com.geekmaker.paykeyboard.IPayRequest;
 import com.geekmaker.paykeyboard.PayKeyboard;
+import com.hjimi.api.iminect.ImiDevice;
+import com.hjimi.api.iminect.ImiDeviceAttribute;
+import com.hjimi.api.iminect.ImiFrameMode;
+import com.hjimi.api.iminect.ImiFrameType;
+import com.hjimi.api.iminect.ImiNect;
+import com.hjimi.api.iminect.ImiPixelFormat;
+import com.hjimi.api.iminect.ImiPropertIds;
 import com.landi.finance.face.aidl.FaceService;
 import com.landi.finance.face.aidl.constant.Constant;
 import com.landicorp.android.eptapi.device.UsbHidDevice;
@@ -50,18 +61,19 @@ import com.landicorp.android.scan.util.LogUtils;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
-import com.tencent.wxpayface.IWxPayFaceCallbackAIDL;
 import com.tencent.wxpayface.IWxPayfaceCallback;
 import com.tencent.wxpayface.WxPayFace;
 import com.tencent.wxpayface.WxfacePayCommonCode;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -111,6 +123,21 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
     private TranslateAnimation translateAnimation;
     private AlertDialog progressDialog;
 
+
+    protected GLPanel mGLPanel;
+    protected SimpleViewer mViewer;
+    protected MainScanActivity.MainListener mainlistener;
+    protected DecodePanel mDecodePanel;
+    protected Surface mSurface;
+    protected ImiDevice mDevice;
+    protected ImiFrameMode mCurrMode = null;
+    protected ImiDeviceAttribute mDeviceAttribute = null;
+    protected static final int DEVICE_OPEN_SUCCESS = 0;
+    protected static final int DEVICE_OPEN_FALIED = 1;
+    protected static final int DEVICE_DISCONNECT = 2;
+    protected static final int MSG_EXIT = 5;
+    public static final int CAMERA_PREVIEW_WIDTH = 640;
+    public static final int CAMERA_PREVIEW_HEIGHT = 480;
     /**
      * HID透传数据
      */
@@ -144,9 +171,15 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
                     speak("扫码成功");
                     handler.sendEmptyMessage(MSG_DO_STOP_SCAN);
                     String faceCode = msg.getData()+"\r\n";
-                    sendDataByHID(faceCode);
-                    handler.sendEmptyMessage(MSG_DO_START_SCAN);
-                    Intent mIntent = new Intent(F8BaseCameraActivity.this,F8WaitForResultActivity.class);
+                    onTradeSucc();
+                    if (isPayByHID){
+                        sendDataByHID(faceCode);
+                        handler.sendEmptyMessage(MSG_DO_START_SCAN);
+                        Intent mIntent = new Intent(F8BaseCameraActivity.this,F8WaitForResultActivity.class);
+                    }else{
+                        startActivity(new Intent(F8BaseCameraActivity.this,ResultSuccActivity.class));
+                    }
+
                     break;
                 case MSG_DO_START_SCAN:
                     handler.postDelayed(()->{
@@ -252,6 +285,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 //                }
 //            }
 //        }
+
         //保持屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Log.i("KeyboardUI","activity start!!!!!!");
@@ -365,7 +399,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
                                             Log.d("lincb","扫码结果 = "+resultTextString);
 //											stringBuffer.append(resultTextString+"\n");
                                             Message message = new Message();
-                                            message.obj = resultTextString.toString();
+                                            message.obj = resultTextString.toString()+"\r\n";
                                             handler.sendMessage(message);
                                         }
                                     } catch (Exception e) {
@@ -442,25 +476,26 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
     };
 
     public void closeCamera(){
-        synchronized (mSync) {
-            isActive = isPreview = false;
-            if (mUVCCamera != null) {
-                //关闭摄像头之前设置为刷脸模式
-                setFaceMode();
-                mUVCCamera.stopPreview();
-                mUVCCamera.destroy();
-                mUVCCamera = null;
-            }
-            if (mUSBMonitor != null) {
-                mUSBMonitor.destroy();
-                mUSBMonitor = null;
-            }
-            if (mPreviewSurface != null) {
-                mPreviewSurface.release();
-                mPreviewSurface = null;
-            }
-            mUVCCameraView = null;
-        }
+//        new Thread(new ExitRunnable()).start();
+//        synchronized (mSync) {
+//            isActive = isPreview = false;
+//            if (mUVCCamera != null) {
+//                //关闭摄像头之前设置为刷脸模式
+//                setFaceMode();
+//                mUVCCamera.stopPreview();
+//                mUVCCamera.destroy();
+//                mUVCCamera = null;
+//            }
+//            if (mUSBMonitor != null) {
+//                mUSBMonitor.destroy();
+//                mUSBMonitor = null;
+//            }
+//            if (mPreviewSurface != null) {
+//                mPreviewSurface.release();
+//                mPreviewSurface = null;
+//            }
+//            mUVCCameraView = null;
+//        }
     }
 
     @Override
@@ -527,32 +562,26 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
      */
     public void doWxFacePay(String amount){
         closeCamera();
-        WxPayFace.getInstance().initWxpayface(this, new IWxPayFaceCallbackAIDL.Stub() {
+        WxPayFace.getInstance().getWxpayfaceRawdata(new IWxPayfaceCallback() {
             @Override
             public void response(Map info) throws RemoteException {
                 if (!isSuccessInfo(info)) {
                     onTradeFaile();
                     return;
                 }
-                WxPayFace.getInstance().getWxpayfaceRawdata(new IWxPayfaceCallback() {
-                    @Override
-                    public void response(Map info) throws RemoteException {
-                        if (!isSuccessInfo(info)) {
-                            onTradeFaile();
-                            return;
-                        }
-                        Log.d(TAG, "response | getWxpayfaceRawdata" );
-                        String rawdata = info.get("rawdata").toString();
-                        try {
-                            getAuthInfo(amount,rawdata);
-                        } catch (Exception e) {
-                            onTradeFaile();
-                            e.printStackTrace();
-                        }
-                    }
-                });
+                Log.d(TAG, "response | getWxpayfaceRawdata" );
+                String rawdata = info.get("rawdata").toString();
+                try {
+                    getAuthInfo(amount,rawdata);
+                } catch (Exception e) {
+                    onTradeFaile();
+                    e.printStackTrace();
+                }
             }
+
+
         });
+
 
     }
 
@@ -609,6 +638,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 
             Request request = new Request.Builder()
                     .url("https://wxpay.wxutil.com/wxfacepay/api/getWxpayFaceAuthInfo.php")
+
                     .post(body)
                     .build();
 
@@ -631,7 +661,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
                                 mAuthInfo = ReturnXMLParser.parseGetAuthInfoXML(response.body().byteStream());
                                 //获取人脸SDK调用凭证成功
                                 HashMap params = new HashMap();
-                                params.put(WxFacePayData.PARAMS_FACE_AUTHTYPE, "FACEPAY");
+                                params.put(WxFacePayData.PARAMS_FACE_AUTHTYPE, "FACEPAY_DELAY");
                                 params.put(WxFacePayData.PARAMS_APPID, WxFacePayData.WECHAT_APP_ID_TEST);
                                 params.put(WxFacePayData.PARAMS_MCH_ID, WxFacePayData.WECHAT_MCH_ID_TEST);
                                 params.put(WxFacePayData.PARAMS_STORE_ID, WxFacePayData.WECHAT_STORE_ID_TEST);
@@ -643,21 +673,70 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
                                 params.put(WxFacePayData.PARAMS_TOTAL_FEE, strAmount);
                                 params.put(WxFacePayData.PARAMS_ASK_RET_PAGE,"0");
                                 params.put(WxFacePayData.PARAMS_AUTHINFO, mAuthInfo);
-//                                params.put(WxFacePayData.PARAMS_IGNORE_PAY_RESULT,"1");
+
+
+//                                HashMap params_delay = new HashMap();
+//                                params_delay.put(WxFacePayData.PARAMS_FACE_AUTHTYPE, "FACEPAY_DELAY");
+//                                params_delay.put(WxFacePayData.PARAMS_APPID, "wx2b029c08a6232582");
+//                                params_delay.put(WxFacePayData.PARAMS_MCH_ID, "1900007081");
+//                                params_delay.put(WxFacePayData.PARAMS_STORE_ID, "12345");
+//                                params_delay.put(WxFacePayData.PARAMS_OUT_TRADE_NO, "" + (System.currentTimeMillis() / 100000));
+//                                params_delay.put(WxFacePayData.PARAMS_TOTAL_FEE, "22222");
+//                                params_delay.put(WxFacePayData.PARAMS_TELEPHONE, "");
+//                                params_delay.put(WxFacePayData.PARAMS_CODE_TYPE,1);
+//                                params_delay.put(WxFacePayData.PARAMS_AUTHINFO, mAuthInfo);
+//                                params_delay.put("sub_mch_id", "1487696602");
+
+                                params.put(WxFacePayData.PARAMS_IGNORE_PAY_RESULT,"1");
                                 WxPayFace.getInstance().getWxpayfaceCode(params, new IWxPayfaceCallback() {
                                     @Override
                                     public void response(Map info) throws RemoteException {
+
                                         runOnUiThread(new Runnable() {
                                             final String code = info.get("return_code").toString();
                                             @Override
                                             public void run() {
                                                 if (TextUtils.equals(code, WxfacePayCommonCode.VAL_RSP_PARAMS_SUCCESS)){
-                                                    Log.d(TAG, "response | getWxpayfaceCode" );
-                                                    final String faceCode = (String)info.get(WxFacePayData.PARAMS_FACE_CODE);
+
+//                                                    try {
+//                                                        Thread.sleep(1000);
+//                                                    } catch (InterruptedException e) {
+//                                                        e.printStackTrace();
+//                                                    }
+//                                                    Map<String, String> param = new HashMap<>();
+//                                                    param.put("appid", "wx2b029c08a6232582");
+//                                                    param.put("mch_id", "1900007081");
+//
+//
+//                                                    param.put("store_id", "12345");
+//                                                    param.put("authinfo", mAuthInfo);
+//
+//                                                    param.put("payresult", "SUCCESS");
+//                                                    WxPayFace.getInstance().updateWxpayfacePayResult(param, new IWxPayfaceCallback() {
+//                                                        @Override
+//                                                        public void response(Map info) throws RemoteException {
+//                                                            Log.d("lincb","updateWxpayfacePayResult");
+//                                                                  startActivity(new Intent(F8BaseCameraActivity.this,ResultSuccActivity.class));
+//
+//                                                        }
+//                                                    });
+
+
+                                                    HashMap<String,String> map = new HashMap<>();
+                                                    map.put(WxFacePayData.PARAMS_APPID,WxFacePayData.WECHAT_APP_ID_TEST);
+                                                    map.put(WxFacePayData.PARAMS_MCH_ID,WxFacePayData.WECHAT_MCH_ID_TEST);
+                                                    map.put(WxFacePayData.PARAMS_STORE_ID,WxFacePayData.WECHAT_STORE_ID_TEST);
+                                                    map.put(WxFacePayData.PARAMS_AUTHINFO,mAuthInfo);
+                                                    map.put(WxFacePayData.PARAMS_PAY_RESULT,WxFacePayData.RETURN_ERROR);
+
+                                                    HashMap params = new HashMap();
+                                                    params.put(WxFacePayData.PARAMS_AUTHINFO, mAuthInfo);
+                                                    final String faceCode = (String)info.get(WxFacePayData.PARAMS_FACE_CODE)+"\r\n";
 //                                                    final String faceCode = "134602233436552566";
                                                     IntegerBuffer integerBuffer = new IntegerBuffer();
                                                     integerBuffer.setData(faceCode.length());
                                                     if (isPayByHID&&usbHidDevice!=null){
+                                                        releaseWxFace();
                                                         Log.d("wxPay","开始通过HID写入数据");
                                                         int result = usbHidDevice.write(faceCode.getBytes(),integerBuffer,0);
                                                         Log.d("wxPay","通过HID写入数据结果="+result);
@@ -665,17 +744,20 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
                                                         return;
                                                     }
                                                     if (TextUtils.equals(code, WxfacePayCommonCode.VAL_RSP_PARAMS_SUCCESS)) {
-                                                        HashMap<String,String> map = new HashMap<>();
-                                                        map.put(WxFacePayData.PARAMS_APPID,WxFacePayData.WECHAT_APP_ID_TEST);
-                                                        map.put(WxFacePayData.PARAMS_MCH_ID,WxFacePayData.WECHAT_MCH_ID_TEST);
-                                                        map.put(WxFacePayData.PARAMS_STORE_ID,WxFacePayData.WECHAT_STORE_ID_TEST);
-                                                        map.put(WxFacePayData.PARAMS_AUTHINFO,mAuthInfo);
-                                                        map.put(WxFacePayData.PARAMS_PAY_RESULT,WxFacePayData.RETURN_SUCCESS);
+//                                                                HashMap<String,String> map = new HashMap<>();
+//                                                                map.put(WxFacePayData.PARAMS_APPID,WxFacePayData.WECHAT_APP_ID_TEST);
+//                                                                map.put(WxFacePayData.PARAMS_MCH_ID,WxFacePayData.WECHAT_MCH_ID_TEST);
+//                                                                map.put(WxFacePayData.PARAMS_STORE_ID,WxFacePayData.WECHAT_STORE_ID_TEST);
+//                                                                map.put(WxFacePayData.PARAMS_AUTHINFO,mAuthInfo);
+//                                                                map.put(WxFacePayData.PARAMS_PAY_RESULT,WxFacePayData.RETURN_SUCCESS);
                                                         onTradeSucc();
                                                         if (isPayBySaler){
                                                             finish();
                                                         }
-                                                        startActivity(new Intent(F8BaseCameraActivity.this,ResultSuccActivity.class));
+                                                        Intent mIntent = new Intent(F8BaseCameraActivity.this,ResultSuccActivity.class);
+                                                        mIntent.putExtra("Amount",amount);
+                                                        startActivity(mIntent);
+                                                        finish();
 //                                                        WxPayFace.getInstance().updateWxpayfacePayResult(map, new IWxPayfaceCallback() {
 //                                                            @Override
 //                                                            public void response(Map info) throws RemoteException {
@@ -690,6 +772,55 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 //                                                            }
 //                                                        });
                                                     }
+
+//                                                    WxPayFace.getInstance().updateWxpayfacePayResult(map, new IWxPayfaceCallback() {
+//                                                        @Override
+//                                                        public void response(Map map) throws RemoteException {
+//                                                            HashMap params = new HashMap();
+//                                                            params.put(WxFacePayData.PARAMS_AUTHINFO, mAuthInfo);
+//                                                            final String faceCode = (String)info.get(WxFacePayData.PARAMS_FACE_CODE)+"\r\n";
+////                                                    final String faceCode = "134602233436552566";
+//                                                            IntegerBuffer integerBuffer = new IntegerBuffer();
+//                                                            integerBuffer.setData(faceCode.length());
+//                                                            if (isPayByHID&&usbHidDevice!=null){
+//                                                                releaseWxFace();
+//                                                                Log.d("wxPay","开始通过HID写入数据");
+//                                                                int result = usbHidDevice.write(faceCode.getBytes(),integerBuffer,0);
+//                                                                Log.d("wxPay","通过HID写入数据结果="+result);
+//                                                                startActivity(new Intent(F8BaseCameraActivity.this,F8WaitForResultActivity.class));
+//                                                                return;
+//                                                            }
+//                                                            if (TextUtils.equals(code, WxfacePayCommonCode.VAL_RSP_PARAMS_SUCCESS)) {
+////                                                                HashMap<String,String> map = new HashMap<>();
+////                                                                map.put(WxFacePayData.PARAMS_APPID,WxFacePayData.WECHAT_APP_ID_TEST);
+////                                                                map.put(WxFacePayData.PARAMS_MCH_ID,WxFacePayData.WECHAT_MCH_ID_TEST);
+////                                                                map.put(WxFacePayData.PARAMS_STORE_ID,WxFacePayData.WECHAT_STORE_ID_TEST);
+////                                                                map.put(WxFacePayData.PARAMS_AUTHINFO,mAuthInfo);
+////                                                                map.put(WxFacePayData.PARAMS_PAY_RESULT,WxFacePayData.RETURN_SUCCESS);
+//                                                                onTradeSucc();
+//                                                                if (isPayBySaler){
+//                                                                    finish();
+//                                                                }
+//                                                                startActivity(new Intent(F8BaseCameraActivity.this,ResultSuccActivity.class));
+////                                                        WxPayFace.getInstance().updateWxpayfacePayResult(map, new IWxPayfaceCallback() {
+////                                                            @Override
+////                                                            public void response(Map info) throws RemoteException {
+////                                                                //跳转到
+////                                                                if (isSuccessInfo(info)){
+////                                                                    onTradeSucc();
+////                                                                    if (isPayBySaler){
+////                                                                        finish();
+////                                                                    }
+////                                                                    startActivity(new Intent(F8BaseCameraActivity.this,ResultSuccActivity.class));
+////                                                                }
+////                                                            }
+////                                                        });
+//                                                            }
+//                                                        }
+//                                                    });
+
+
+
                                                 }else if (TextUtils.equals(code, WxfacePayCommonCode.VAL_RSP_PARAMS_USER_CANCEL)) {
                                                     ToastUtil.toast("用户取消");
                                                     onTradeCancel();
@@ -713,6 +844,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
                             } catch (Exception e) {
                                 showMes("onFailure | getAuthInfo " + e.toString());
                                 progressDialog.dismiss();
+                                releaseWxFace();
                                 e.printStackTrace();
                             }
                             Log.d(TAG, "onResponse | getAuthInfo " + mAuthInfo);
@@ -744,7 +876,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
     }
 
 
-    private PayKeyboard payKeyboard;
+    public PayKeyboard payKeyboard;
     public void updateSignal(){
         int w =4;
         int g = 0;
@@ -769,7 +901,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 
     @Override
     public void onTradeSucc() {
-        WxPayFace.getInstance().releaseWxpayface(this);
+//        WxPayFace.getInstance().releaseWxpayface(this);
         IPayRequest iPayRequest = f8Application.getmIrequest();
         if (iPayRequest!=null){
             iPayRequest.setResult(true);
@@ -786,7 +918,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 
     @Override
     public void onTradeFaile() {
-        WxPayFace.getInstance().releaseWxpayface(this);
+//        WxPayFace.getInstance().releaseWxpayface(this);
         if (isPayBySaler){
             finish();
         }
@@ -806,7 +938,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 
     @Override
     public void onTradeCancel() {
-        WxPayFace.getInstance().releaseWxpayface(this);
+//        WxPayFace.getInstance().releaseWxpayface(this);
         if (isPayBySaler){
             finish();
         }
@@ -844,17 +976,23 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
      *  设置微信刷脸模式
      */
     public void setFaceMode(){
-        try{
-            if (mUVCCamera!=null){
-                mUVCCamera.updateCameraParams();
-                mUVCCamera.setValue(UVCCamera.PU_BACKLIGHT,50);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+//        try{
+//            if (mUVCCamera!=null){
+//                mUVCCamera.updateCameraParams();
+//                mUVCCamera.setValue(UVCCamera.PU_BACKLIGHT,50);
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
 
 
     }
+
+    public void releaseWxFace(){
+//        Log.d("lincb","releaseWxFace");
+//        WxPayFace.getInstance().releaseWxpayface(this);
+    }
+
     protected UsbHidDevice usbHidDevice;    //虚拟HID通讯
     protected void  usbHidDevice(){
         usbHidDevice = UsbHidDevice.getInstance();
@@ -866,5 +1004,166 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
             usbHidDevice = null;
         }
     }
+    protected MyHandler MainHandler = new MyHandler(this);
 
+    protected class MainListener implements ImiDevice.OpenDeviceListener{
+
+        @Override
+        public void onOpenDeviceSuccess() {
+            //open device success.
+            Log.d("lincb","打开摄像头成功");
+
+            mDeviceAttribute = mDevice.getAttribute();
+            mDevice.setProperty(ImiPropertIds.IMI_CAM_PROPERTY_COLOR_BACKLIGHT_COMPENSATION,2);
+            MainHandler.sendEmptyMessage(DEVICE_OPEN_SUCCESS);
+        }
+
+        @Override
+        public void onOpenDeviceFailed(String errorMsg) {
+            //open device falied.
+            MainHandler.sendMessage(MainHandler.obtainMessage(DEVICE_OPEN_FALIED, errorMsg));
+        }
+    }
+
+    protected  class MyHandler extends Handler {
+        WeakReference<F8BaseCameraActivity> mActivity;
+        public MyHandler(F8BaseCameraActivity activity) {
+            mActivity = new WeakReference<F8BaseCameraActivity>(activity);
+        }
+        @Override
+        public void handleMessage(Message msg) {
+            F8BaseCameraActivity mainActivity = mActivity.get();
+            switch (msg.what)
+            {
+                case DEVICE_OPEN_FALIED:
+                    ToastUtil.toast("摄像头被占用无法打开。");
+                    break;
+                case DEVICE_DISCONNECT:
+                    break;
+                case DEVICE_OPEN_SUCCESS:
+                    mainActivity.runViewer();
+                    break;
+                case MSG_EXIT:
+                    mainActivity.Exit();
+                    break;
+            }
+        }
+    }
+    private ReentrantLock reentrantLock = new ReentrantLock();
+    protected void runViewer() {
+        Log.d("lincb","runViewer扫码开启 = "+isCanScan);
+        mViewer = new SimpleViewer(mDevice, ImiFrameType.COLOR);
+        mViewer.setOnGetFrameResult(new SimpleViewer.OnGetFrameResult() {
+            @Override
+            public void onFrame(final ByteBuffer byteBuffer) {
+                try {
+                    reentrantLock.lock();
+                    if (isCanScan){
+                        int len = byteBuffer.capacity();
+                        byte[] yuv = new byte[len];
+                        byteBuffer.get(yuv);
+                        yuv = LdBitmapFactory.createYUVData(yuv,CAMERA_PREVIEW_WIDTH,CAMERA_PREVIEW_HEIGHT);
+                        String resultTextString = DecodeEngine.getInstance().decode(yuv, CAMERA_PREVIEW_WIDTH, CAMERA_PREVIEW_HEIGHT);
+//                        Log.d("lincb","扫码结果 = "+resultTextString);
+                        if (!TextUtils.isEmpty(resultTextString)&&isCanScan){
+                            if (beepManager!=null){
+                                beepManager.playBeepSoundAndVibrate();
+                            }
+                            Log.d("lincb","扫码结果 = "+resultTextString);
+                            isCanScan = false;
+                            Message message = new Message();
+                            message.obj = resultTextString+"\r\n";
+                            message.what = MSG_DO_SCAN_PAY;
+                            handler.sendMessage(message);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }finally {
+                    reentrantLock.unlock();
+                }
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void getFrameFail() {
+
+            }
+        });
+        switch (mCurrMode.getFormat())
+        {
+            case IMI_PIXEL_FORMAT_IMAGE_H264:
+                mDecodePanel.initDecoder(mSurface, mCurrMode.getResolutionX(),
+                        mCurrMode.getResolutionY());
+                mViewer.setDecodePanel(mDecodePanel);
+                break;
+            case IMI_PIXEL_FORMAT_IMAGE_YUV420SP:
+                ImiDevice.ImiFrame frame = mDevice.readNextFrame(ImiDevice.ImiStreamType.COLOR,0);
+                ByteBuffer byteBuffer = frame.getData();
+                String resultTextString = null;
+                try {
+                    byte[] b = new byte[byteBuffer.remaining()];
+                    byteBuffer.get(b, 0, b.length);
+                    resultTextString = DecodeEngine.getInstance().decode(b, 640, 480);
+                    if (!TextUtils.isEmpty(resultTextString)){
+                        Log.d("lincb","扫码结果 = "+resultTextString);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                mUVCCameraView.setVisibility(View.GONE);
+                mGLPanel.setVisibility(View.VISIBLE);
+                mViewer.setGLPanel(mGLPanel);
+                break;
+        }
+
+        mViewer.onStart();
+    }
+    private void Exit() {
+        ImiDevice.destroy();
+        ImiNect.destroy();
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
+    protected class OpenDeviceRunnable implements Runnable{
+
+        @Override
+        public void run() {
+            if (mDevice!=null){
+                mDevice.close();
+            }
+            ImiFrameMode frameMode = new ImiFrameMode(ImiPixelFormat.IMI_PIXEL_FORMAT_IMAGE_RGB24, CAMERA_PREVIEW_WIDTH, CAMERA_PREVIEW_HEIGHT, 30);
+            mDevice.setFrameMode(ImiDevice.ImiStreamType.COLOR, frameMode);
+            mCurrMode = frameMode;
+            Log.d("lincb","准备打开摄像头");
+            mDevice.open(F8BaseCameraActivity.this, ImiDevice.ImiStreamType.COLOR.toNative(), mainlistener);
+        }
+    }
+    protected class ExitRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            if(mDevice != null) {
+                mDevice.setProperty(ImiPropertIds.IMI_CAM_PROPERTY_COLOR_BACKLIGHT_COMPENSATION,1);
+                mDevice.close();
+                Log.d("lincb","close camera");
+            }
+        }
+    }
+
+
+    /**
+     * 释放扫码摄像头
+     */
+    public void releaseScanCamera(){
+//        new Thread(new ExitRunnable()).start();
+
+    }
 }

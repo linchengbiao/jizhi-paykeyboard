@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.landicorp.f8face.R;
+import com.android.landicorp.f8face.activity.ChooseBluActivity;
 import com.android.landicorp.f8face.activity.F8WxCurrentPayTypeActivity;
 import com.android.landicorp.f8face.activity.ShowADImageActivity;
 import com.android.landicorp.f8face.view.CusPreferenceWithArrowView;
@@ -40,7 +41,7 @@ public class F8WxSettingFragment extends PreferenceFragment implements Preferenc
     private String mParam1;
     private String mParam2;
     public static final int IMAGE_PICKER = 100;
-    private CusPreferenceWithArrowView wxSettingPreHb,wxSettingPrePayType,wxSettingPreAccount,wxSettingSystem;
+    private CusPreferenceWithArrowView wxSettingPreHb,wxSettingPrePayType,wxSettingPreAccount,wxSettingSystem,wxBleHIDSetting;
     private OnFragmentInteractionListener mListener;
 
     public F8WxSettingFragment() {
@@ -78,11 +79,13 @@ public class F8WxSettingFragment extends PreferenceFragment implements Preferenc
         wxSettingPrePayType = (CusPreferenceWithArrowView)findPreference(getString(R.string.key_wx_pre2));
         wxSettingPreAccount = (CusPreferenceWithArrowView)findPreference(getString(R.string.key_wx_pre3));
         wxSettingSystem = (CusPreferenceWithArrowView)findPreference(getString(R.string.key_wx_pre4));
+        wxBleHIDSetting  = (CusPreferenceWithArrowView)findPreference(getString(R.string.key_wx_pre5));
 
         wxSettingPreHb.setOnPreferenceClickListener(this);
         wxSettingPrePayType.setOnPreferenceClickListener(this);
         wxSettingPreAccount.setOnPreferenceClickListener(this);
         wxSettingSystem.setOnPreferenceClickListener(this);
+        wxBleHIDSetting.setOnPreferenceClickListener(this);
     }
 
 
@@ -142,7 +145,6 @@ public class F8WxSettingFragment extends PreferenceFragment implements Preferenc
     public boolean onPreferenceClick(Preference preference) {
         if (preference.getKey().equalsIgnoreCase(getString(R.string.key_wx_pre1))){
             pickImage();
-
         }else if(preference.getKey().equalsIgnoreCase(getString(R.string.key_wx_pre2))){
             Intent mIntent = new Intent(getActivity(), F8WxCurrentPayTypeActivity.class);
             startActivity(mIntent);
@@ -150,6 +152,9 @@ public class F8WxSettingFragment extends PreferenceFragment implements Preferenc
             Toast.makeText(getActivity(),"正在开放中，敬请期待",Toast.LENGTH_LONG).show();
         }else if(preference.getKey().equalsIgnoreCase(getString(R.string.key_wx_pre4))){
             startActivity(new Intent(Settings.ACTION_SETTINGS));
+        }else if(preference.getKey().equalsIgnoreCase(getString(R.string.key_wx_pre5))){
+            Intent mIntent = new Intent(getActivity(), ChooseBluActivity.class);
+            startActivity(mIntent);
         }
         return true;
     }

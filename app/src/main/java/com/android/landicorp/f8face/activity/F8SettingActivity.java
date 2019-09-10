@@ -26,6 +26,7 @@ public class F8SettingActivity extends BaseActivity implements F8WxSettingFragme
         transaction = fragmentManager.beginTransaction();
         settingFragment = new F8WxSettingFragment();
         EventBus.getDefault().register(this);
+        speak(getString(R.string.voice_setting));
     }
 
     @Override

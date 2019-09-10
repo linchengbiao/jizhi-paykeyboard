@@ -109,9 +109,9 @@ public class F8Application extends Application implements ICheckListener {
         }
         initialTts();
         openKeyboard();
-
 //        initUniversalImageLoader();
 //        initImagePicker();
+
     }
 
     private void showToast(final String text) {
@@ -127,6 +127,11 @@ public class F8Application extends Application implements ICheckListener {
     public PayKeyboard getPayKeyboard(){
         return keyboard;
     };
+
+
+    private long mLastClickTime = 0;
+    public static final int TIME_INTERVAL = 1000;
+
 
 
     private IKeyboardListener mKeyboardListener = new DefaultKeyboardListener() {
@@ -174,9 +179,15 @@ public class F8Application extends Application implements ICheckListener {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    //数字输入
+//                    if(keyCode > 0 && keyCode <=5 || keyCode >=14 && keyCode <= 16
+//                            || keyCode ==9 || keyCode == 19 || keyCode == 31){
+//                        EventBus.getDefault().post(new WxAmountMessageEvent(keyName));
+//                        return;
+//                    }
+
                     //设置
-                    if (keyName.equalsIgnoreCase(PayKeyboard.KEY_OPT)){
-                        speak(getString(R.string.voice_setting));
+                    if (keyName.equalsIgnoreCase(PayKeyboard.KEY_LIST)){
                         EventBus.getDefault().post(new SendVoidMessageEvent());
                     }else if(keyName.equalsIgnoreCase(PayKeyboard.KEY_PAY)){
                         //如果有输入键盘，则这边响应事件要过滤，否则重复监听onPay
@@ -190,16 +201,26 @@ public class F8Application extends Application implements ICheckListener {
                         if (isPayByHID){
                             EventBus.getDefault().post(new WxFacePayMessageEvent("0"));
                         }else{
+                              //进入金额显示界面
+                            speak("请输入交易金额");
                             ToastUtil.toast("金额输入格式错误");
                         }
-                    }else if(keyName.equalsIgnoreCase(PayKeyboard.KEY_ESC)){
+                    }else if(keyName.equalsIgnoreCase(PayKeyboard.KEY_OPT)){
                         EventBus.getDefault().post(new KeyBoardCancelMessageEvent());
                     }else if (keyName.equalsIgnoreCase(PayKeyboard.KEY_FACE_PAY)){
-                        if (isPayByHID){
+                        //按刷脸键进入刷脸
+                        if (System.currentTimeMillis() - mLastClickTime >= TIME_INTERVAL) {
+                            mLastClickTime = System.currentTimeMillis();
                             EventBus.getDefault().post(new WxFacePayMessageEvent("0"));
-                        }else{
+                        } else {
 
                         }
+
+//                        if (isPayByHID){
+//                            EventBus.getDefault().post(new WxFacePayMessageEvent("0"));
+//                        }else{
+////                            EventBus.getDefault().post(new WxGoShowAmountMessageEvent(""));
+//                        }
                     }
                 }
             });

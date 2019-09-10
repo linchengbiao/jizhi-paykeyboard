@@ -1,6 +1,8 @@
 package com.android.landicorp.f8face.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.TextView;
 
 import com.android.landicorp.f8face.R;
@@ -40,6 +42,14 @@ public class F8WaitForResultActivity extends BaseActivity {
 
             }
         });
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent mIntent = new Intent(F8WaitForResultActivity.this,ResultSuccActivity.class);
+                mIntent.putExtra("Amount","0.01");
+                startActivity(mIntent);
+            }
+        },2000);
         showLeftIv(R.drawable.ic_close_gray,"");
         showRightIv(0,"");
         speak("请等待收银员确认支付结果");

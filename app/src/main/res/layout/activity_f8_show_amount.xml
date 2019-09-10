@@ -10,9 +10,16 @@
     tools:context="com.android.landicorp.f8face.activity.MainActivity">
     <SurfaceView
         android:id="@+id/camera_surface_view"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
+        android:layout_width="1px"
+        android:layout_height="1px"
+        android:layout_marginBottom="25dp"
         />
+    <com.android.landicorp.f8face.IMI.GLPanel
+        android:visibility="gone"
+        android:id="@+id/sv_color_view"
+        android:layout_width="1px"
+        android:layout_height="1px"
+        android:layout_centerInParent="true"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -2,16 +2,18 @@ package com.android.landicorp.f8face.activity;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import com.android.landicorp.f8face.R;
 import com.android.landicorp.f8face.util.FullScreen;
 import com.android.landicorp.f8face.view.F8ToolBarView;
 
 public class ResultSuccActivity extends BaseActivity implements View.OnClickListener{
-
+    private String amount;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,11 +23,21 @@ public class ResultSuccActivity extends BaseActivity implements View.OnClickList
         FullScreen.NavigationBarStatusBar(this,true);
         setContentView(R.layout.activity_result_succ);
         findViewById(R.id.btn_main_page).setOnClickListener(this);
+        amount = getIntent().getStringExtra("Amount");
+        TextView textView = findViewById(R.id.tv_product_amount);
+        textView.setText(amount+"元");
+        TextView titleView = findViewById(R.id.tv_pay_amount);
+        titleView.setText(amount+"元");
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (!TextUtils.isEmpty(amount)){
+            speak("收款"+amount+"元");
+        }
+
         toolbar.setBackgroundResource(R.color.white);
         setSupportActionBar(toolbar);
         showLeftTextClock(15, new F8ToolBarView.OnDelayTimeListener() {

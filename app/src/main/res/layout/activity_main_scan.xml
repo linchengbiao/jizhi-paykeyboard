@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.youth.banner.Banner xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    app:image_scale_type="fit_xy"
-    android:id="@+id/barner"
-    android:background="@drawable/img_f8_standby_1"
+    android:fitsSystemWindows="true"
     tools:context="com.android.landicorp.f8face.activity.MainActivity">
 
+    <com.youth.banner.Banner
+        android:id="@+id/barner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="120dp"
+        app:image_scale_type="fit_xy">
+    </com.youth.banner.Banner>
     <SurfaceView
         android:id="@+id/camera_surface_view"
-        android:layout_width="100px"
-        android:layout_height="100px"
+        android:layout_width="1px"
+        android:layout_height="1px"
         android:layout_marginBottom="25dp"
         />
     <com.android.landicorp.f8face.IMI.GLPanel
         android:visibility="gone"
         android:id="@+id/sv_color_view"
-        android:layout_width="100px"
-        android:layout_height="100px"
+        android:layout_width="1px"
+        android:layout_height="1px"
         android:layout_centerInParent="true"/>
 
     <!--<SurfaceView-->
@@ -141,7 +146,14 @@
                 android:layout_marginTop="10dp"
                 android:layout_gravity="center_horizontal"
                 />
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:textColor="@color/BLACK"
+                android:id="@+id/et_amount"
+                />
         </LinearLayout>
     </RelativeLayout>
 
-</com.youth.banner.Banner>
+</FrameLayout>
