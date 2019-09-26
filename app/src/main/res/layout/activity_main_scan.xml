@@ -15,18 +15,7 @@
         android:layout_marginBottom="120dp"
         app:image_scale_type="fit_xy">
     </com.youth.banner.Banner>
-    <SurfaceView
-        android:id="@+id/camera_surface_view"
-        android:layout_width="1px"
-        android:layout_height="1px"
-        android:layout_marginBottom="25dp"
-        />
-    <com.android.landicorp.f8face.IMI.GLPanel
-        android:visibility="gone"
-        android:id="@+id/sv_color_view"
-        android:layout_width="1px"
-        android:layout_height="1px"
-        android:layout_centerInParent="true"/>
+
 
     <!--<SurfaceView-->
         <!--android:id="@+id/camera_surface_view"-->

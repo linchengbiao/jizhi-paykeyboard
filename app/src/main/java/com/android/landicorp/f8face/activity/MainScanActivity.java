@@ -6,23 +6,16 @@ import android.graphics.drawable.TransitionDrawable;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.landicorp.f8face.IMI.DecodePanel;
-import com.android.landicorp.f8face.IMI.GLPanel;
 import com.android.landicorp.f8face.R;
 import com.android.landicorp.f8face.inter.SendVoidMessageEvent;
 import com.android.landicorp.f8face.inter.WxAmountMessageEvent;
@@ -31,10 +24,9 @@ import com.android.landicorp.f8face.inter.WxGoShowAmountMessageEvent;
 import com.android.landicorp.f8face.util.BitmapUtil;
 import com.android.landicorp.f8face.util.FullScreen;
 import com.android.landicorp.f8face.util.MoneyEditUtils;
+import com.android.landicorp.f8face.util.ToastUtil;
 import com.android.landicorp.f8face.view.GlideImageLoader;
-import com.hjimi.api.iminect.ImiDevice;
-import com.hjimi.api.iminect.ImiNect;
-import com.tencent.wxpayface.IWxPayfaceCallback;
+import com.geekmaker.paykeyboard.PayKeyboard;
 import com.tencent.wxpayface.WxPayFace;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
@@ -47,7 +39,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 
 public class MainScanActivity extends F8BaseCameraActivity implements View.OnClickListener{
@@ -65,10 +56,7 @@ public class MainScanActivity extends F8BaseCameraActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        FullScreen.fullScreen(this);
-        FullScreen.NavigationBarStatusBar(this,true);
+        FullScreen.fullScreenWithoutBar(this);
         setContentView(R.layout.activity_main_scan);
         payByHIDLayout = (LinearLayout)findViewById(R.id.ll_pay_HID);
         payBySalerLayout = (LinearLayout)findViewById(R.id.ll_pay_saler);
@@ -82,34 +70,6 @@ public class MainScanActivity extends F8BaseCameraActivity implements View.OnCli
         scanLayout.setOnClickListener(this);
         faceScanLayout = (LinearLayout)findViewById(R.id.ll_face_scan);
         faceScanLayout.setOnClickListener(this);
-        mUVCCameraView = (SurfaceView)findViewById(R.id.camera_surface_view);
-        mGLPanel = (GLPanel) findViewById(R.id.sv_color_view);
-        ImiNect.initialize();
-        mDevice = ImiDevice.getInstance();
-        mainlistener = new MainListener();
-        mUVCCameraView.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder surfaceHolder) {
-                mSurface = surfaceHolder.getSurface();
-                mDecodePanel = new DecodePanel();
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-                mDecodePanel.stopDecoder();
-            }
-        });
-        WxPayFace.getInstance().initWxpayface(getApplicationContext(), new IWxPayfaceCallback() {
-            @Override
-            public void response(Map map) throws RemoteException {
-
-            }
-        });
     }
 
     public void initIndicatorView(){
@@ -163,9 +123,7 @@ public class MainScanActivity extends F8BaseCameraActivity implements View.OnCli
         isCanScan = true;
         Log.d("lincb","onResume");
 //        new Handler().postDelayed(new OpenDeviceRunnable(),500);
-        if(mViewer != null){
-            mViewer.onResume();
-        }
+
     }
 
     @Override
@@ -173,7 +131,6 @@ public class MainScanActivity extends F8BaseCameraActivity implements View.OnCli
         super.onPause();
         EventBus.getDefault().unregister(this);
         Log.d("lincb","onPause");
-        releaseScanCamera();
     }
 
 
@@ -237,6 +194,11 @@ public class MainScanActivity extends F8BaseCameraActivity implements View.OnCli
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        exitApp();
+    }
+
     public void doFacePay(String amount){
         //如果是独立收银模式，跳转进入显示金额界面
 //        amount = tvAmountValue.getText().toString();
@@ -257,7 +219,6 @@ public class MainScanActivity extends F8BaseCameraActivity implements View.OnCli
     }
 
 
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(WxFacePayMessageEvent event) {
         doFacePay(event.mAmount);
@@ -275,21 +236,30 @@ public class MainScanActivity extends F8BaseCameraActivity implements View.OnCli
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(WxAmountMessageEvent event) {
-        tvAmountValue.getText().append(event.value);
-        MoneyEditUtils.afterDotTwo(tvAmountValue);
-        if(".".equals(tvAmountValue.getText().toString())){
-            tvAmountValue.setText("0.");
-        }
-        double amount = Double.valueOf(tvAmountValue.getText().toString());
-        if(amount > 99999999){
+        if(event.value.equalsIgnoreCase(PayKeyboard.KEY_Backspace)){
+            if(tvAmountValue.getText().length() <= 0){
+                return;
+            }
             tvAmountValue.getText().delete(tvAmountValue.getText().length()-1,tvAmountValue.getText().length());
-            speak("最大支付金额："+99999999+"元");
-            return;
+            MoneyEditUtils.afterDotTwo(tvAmountValue);
+        }else{
+            tvAmountValue.getText().append(event.value);
+            MoneyEditUtils.afterDotTwo(tvAmountValue);
+            if(".".equals(tvAmountValue.getText().toString())){
+                tvAmountValue.setText("0.");
+            }
+            double amount = Double.valueOf(tvAmountValue.getText().toString());
+            if(amount > 99999999){
+                tvAmountValue.getText().delete(tvAmountValue.getText().length()-1,tvAmountValue.getText().length());
+                speak("最大支付金额："+99999999+"元");
+                return;
+            }
+            if(tvAmountValue.getText().toString().length() > 8){
+                tvAmountValue.getText().delete(tvAmountValue.getText().length()-1,tvAmountValue.getText().length());
+                return;
+            }
         }
-        if(tvAmountValue.getText().toString().length() > 8){
-            tvAmountValue.getText().delete(tvAmountValue.getText().length()-1,tvAmountValue.getText().length());
-            return;
-        }
+
         payKeyboard.updateDisplay(tvAmountValue.getText().toString(),true);
     }
 
@@ -298,8 +268,17 @@ public class MainScanActivity extends F8BaseCameraActivity implements View.OnCli
         closeCamera();
         startActivity(new Intent(getApplicationContext(), F8SettingActivity.class));
     }
-
-
+    private long firstClickTimes = 0;
+    private void exitApp(){
+        if (System.currentTimeMillis()-firstClickTimes>2000){
+            ToastUtil.toast("再按一次退出");
+            firstClickTimes = System.currentTimeMillis();
+        }else {
+            finish();
+            WxPayFace.getInstance().releaseWxpayface(getApplicationContext());
+            System.exit(0);
+        }
+    }
 
 
 }

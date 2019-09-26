@@ -63,10 +63,6 @@
             android:configChanges="keyboardHidden|screenSize|orientation"
             android:windowSoftInputMode="stateHidden|adjustUnspecified" />
         <activity
-            android:name=".activity.InputPinActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="stateHidden|adjustUnspecified" />
-        <activity
             android:name=".activity.F8FacePayMainActivity"
             android:configChanges="keyboardHidden|screenSize|orientation"
             android:screenOrientation="portrait"

@@ -14,21 +14,19 @@ import android.view.WindowManager;
 
 import com.android.landicorp.f8face.F8Application;
 import com.android.landicorp.f8face.R;
-import com.android.landicorp.f8face.baidu.controller.MySyntherizer;
 import com.android.landicorp.f8face.inter.TradeStatusInter;
 import com.android.landicorp.f8face.util.AppUtil;
 import com.android.landicorp.f8face.util.FullScreen;
+import com.android.landicorp.f8face.util.TTSUtils;
 import com.android.landicorp.f8face.view.F8ToolBarView;
 import com.geekmaker.paykeyboard.IPayRequest;
 import com.geekmaker.paykeyboard.PayKeyboard;
-import com.landicorp.android.scan.util.LogUtils;
 
 public class BaseActivity extends AppCompatActivity implements TradeStatusInter{
     private Handler handler = new Handler();
     public boolean isPayByHID,isPayBySaler;
     private F8Application f8Application;
     protected F8ToolBarView toolbar;
-    private MySyntherizer mySyntherizer;
     protected SharedPreferences preference;
     protected SharedPreferences.Editor editor;
 
@@ -42,12 +40,11 @@ public class BaseActivity extends AppCompatActivity implements TradeStatusInter{
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         f8Application = (F8Application)getApplication();
         payKeyboard = f8Application.getPayKeyboard();
-        mySyntherizer = f8Application.getSynthesizer();
         //获取设置界面数据
         preference = PreferenceManager.getDefaultSharedPreferences(this);
         editor = preference.edit();
-        isPayBySaler = preference.getBoolean(getString(R.string.key_pre_pay_saler),false);
-        isPayByHID = preference.getBoolean(getString(R.string.key_pre_pay_self),true);
+        isPayBySaler = preference.getBoolean(getString(R.string.key_pre_pay_saler),true);
+        isPayByHID = preference.getBoolean(getString(R.string.key_pre_pay_self),false );
     }
 
     @Override
@@ -80,10 +77,7 @@ public class BaseActivity extends AppCompatActivity implements TradeStatusInter{
         // 合成前可以修改参数：
         // Map<String, String> params = getParams();
         // synthesizer.setParams(params);
-        if (mySyntherizer!=null){
-            int result = mySyntherizer.speak(text);
-            checkResult(result, "speak");
-        }
+        TTSUtils.speak(text);
 
     }
 
@@ -216,7 +210,6 @@ public class BaseActivity extends AppCompatActivity implements TradeStatusInter{
 
     private void checkResult(int result, String method) {
         if (result != 0) {
-            LogUtils.i("lincb","error code :" + result + " method:" + method + ", 错误码文档:http://yuyin.baidu.com/docs/tts/122 ");
         }
     }
 

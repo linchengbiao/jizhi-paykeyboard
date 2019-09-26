@@ -12,7 +12,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.landicorp.f8face.R;
-import com.android.landicorp.f8face.activity.ChooseBluActivity;
 import com.android.landicorp.f8face.activity.F8WxCurrentPayTypeActivity;
 import com.android.landicorp.f8face.activity.ShowADImageActivity;
 import com.android.landicorp.f8face.view.CusPreferenceWithArrowView;
@@ -153,8 +152,10 @@ public class F8WxSettingFragment extends PreferenceFragment implements Preferenc
         }else if(preference.getKey().equalsIgnoreCase(getString(R.string.key_wx_pre4))){
             startActivity(new Intent(Settings.ACTION_SETTINGS));
         }else if(preference.getKey().equalsIgnoreCase(getString(R.string.key_wx_pre5))){
-            Intent mIntent = new Intent(getActivity(), ChooseBluActivity.class);
-            startActivity(mIntent);
+//            Intent mIntent = new Intent(getActivity(), ChooseBluActivity.class);
+//            startActivity(mIntent);
+            Toast.makeText(getActivity(),"正在开放中，敬请期待",Toast.LENGTH_LONG).show();
+
         }
         return true;
     }

@@ -40,7 +40,7 @@ public class ResultSuccActivity extends BaseActivity implements View.OnClickList
 
         toolbar.setBackgroundResource(R.color.white);
         setSupportActionBar(toolbar);
-        showLeftTextClock(15, new F8ToolBarView.OnDelayTimeListener() {
+        showLeftTextClock(6, new F8ToolBarView.OnDelayTimeListener() {
             @Override
             public void onDelayTime() {
                 finish();

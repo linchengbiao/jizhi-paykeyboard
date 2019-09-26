@@ -1,24 +1,18 @@
 package com.android.landicorp.f8face.activity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.hardware.usb.UsbDevice;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -26,54 +20,31 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.android.landicorp.f8face.F8Application;
-import com.android.landicorp.f8face.IMI.DecodePanel;
-import com.android.landicorp.f8face.IMI.GLPanel;
-import com.android.landicorp.f8face.IMI.LdBitmapFactory;
-import com.android.landicorp.f8face.IMI.SimpleViewer;
 import com.android.landicorp.f8face.R;
-import com.android.landicorp.f8face.baidu.controller.MySyntherizer;
 import com.android.landicorp.f8face.data.WxFacePayData;
 import com.android.landicorp.f8face.http.ReturnXMLParser;
 import com.android.landicorp.f8face.inter.TradeStatusInter;
 import com.android.landicorp.f8face.util.AppUtil;
 import com.android.landicorp.f8face.util.FullScreen;
+import com.android.landicorp.f8face.util.TTSUtils;
 import com.android.landicorp.f8face.util.ToastUtil;
 import com.android.landicorp.f8face.view.SpotsDialog;
 import com.geekmaker.paykeyboard.IPayRequest;
 import com.geekmaker.paykeyboard.PayKeyboard;
-import com.hjimi.api.iminect.ImiDevice;
-import com.hjimi.api.iminect.ImiDeviceAttribute;
-import com.hjimi.api.iminect.ImiFrameMode;
-import com.hjimi.api.iminect.ImiFrameType;
-import com.hjimi.api.iminect.ImiNect;
-import com.hjimi.api.iminect.ImiPixelFormat;
-import com.hjimi.api.iminect.ImiPropertIds;
-import com.landi.finance.face.aidl.FaceService;
-import com.landi.finance.face.aidl.constant.Constant;
 import com.landicorp.android.eptapi.device.UsbHidDevice;
 import com.landicorp.android.eptapi.utils.IntegerBuffer;
-import com.landicorp.android.scan.decode.DecodeEngine;
-import com.landicorp.android.scan.scanDecoder.ScanDecoderParameter;
-import com.landicorp.android.scan.util.LogUtils;
-import com.serenegiant.usb.IFrameCallback;
-import com.serenegiant.usb.USBMonitor;
-import com.serenegiant.usb.UVCCamera;
 import com.tencent.wxpayface.IWxPayfaceCallback;
 import com.tencent.wxpayface.WxPayFace;
 import com.tencent.wxpayface.WxfacePayCommonCode;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
-import java.nio.ByteBuffer;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -92,12 +63,9 @@ import okhttp3.Response;
  * Created by admin on 2019/6/18.
  */
 
-public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity implements TradeStatusInter{
+public class F8BaseCameraActivity extends Activity implements TradeStatusInter{
     private final Object mSync = new Object();
-    private USBMonitor mUSBMonitor;
     private boolean isActive, isPreview;
-    private Surface mPreviewSurface;
-    protected SurfaceView mUVCCameraView;
     private BeepManager beepManager;
     protected SharedPreferences preference;
     protected static final int MSG_DO_FACE_PAY = 0;
@@ -110,13 +78,10 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
     protected static final int MSG_DO_STOP_SCAN = 7;
     protected static final int MSG_DO_RESTART = 8;
     protected  boolean isCanScan = true;
-    public static FaceService face;
     public static final String TAG = "F8BaseCameraActivity";
     private String mAuthInfo;
     public boolean isPayByHID,isPayBySaler;
     private F8Application f8Application;
-    private MySyntherizer mySyntherizer;
-    protected UVCCamera mUVCCamera;
     protected Set<String> images;
     protected LinearLayout scanLayout;
     protected ImageView ivScannerIcon;
@@ -124,14 +89,8 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
     private AlertDialog progressDialog;
 
 
-    protected GLPanel mGLPanel;
-    protected SimpleViewer mViewer;
-    protected MainScanActivity.MainListener mainlistener;
-    protected DecodePanel mDecodePanel;
     protected Surface mSurface;
-    protected ImiDevice mDevice;
-    protected ImiFrameMode mCurrMode = null;
-    protected ImiDeviceAttribute mDeviceAttribute = null;
+
     protected static final int DEVICE_OPEN_SUCCESS = 0;
     protected static final int DEVICE_OPEN_FALIED = 1;
     protected static final int DEVICE_DISCONNECT = 2;
@@ -199,29 +158,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
         }
     };
 
-    private ServiceConnection connService = new ServiceConnection() {
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            face = null;
-            Toast.makeText(F8BaseCameraActivity.this, "SDK绑定失败", Toast.LENGTH_SHORT).show();
-        }
 
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            face = FaceService.Stub.asInterface(service);
-
-        }
-    };
-    public void bindService() {
-        Intent intent = new Intent();
-        intent.setPackage(Constant.SERVICE_PACKAGE);
-        intent.setAction(Constant.SERVICE_ACTION);
-        try{
-            bindService(intent, connService, Context.BIND_AUTO_CREATE);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -232,7 +169,6 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         f8Application = (F8Application)getApplication();
         payKeyboard = f8Application.getPayKeyboard();
-        mySyntherizer = f8Application.getSynthesizer();
         ToastUtil.init(this);
         beepManager = new BeepManager(this);
         beepManager.updatePrefs();
@@ -259,11 +195,6 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 
     @Override
     protected void onStop() {
-        synchronized (mSync) {
-            if (mUSBMonitor != null) {
-                mUSBMonitor.unregister();
-            }
-        }
         super.onStop();
     }
 
@@ -271,21 +202,6 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
     protected void onResume() {
         FullScreen.NavigationBarStatusBar(this,true);
         super.onResume();
-//        mUSBMonitor = new USBMonitor(this, mOnDeviceConnectListener);
-//        synchronized (mSync) {
-//            if (mUSBMonitor != null) {
-//                mUSBMonitor.register();
-//                List<UsbDevice> devices = mUSBMonitor.getDeviceList();
-//                if (devices!=null&&devices.size()>0){
-//                    for (UsbDevice device:devices){
-//                        if (device.getProductId() == 515 && device.getVendorId() == 11707){
-//                            mUSBMonitor.requestPermission(device);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
         //保持屏幕常亮
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Log.i("KeyboardUI","activity start!!!!!!");
@@ -294,25 +210,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
         isPayBySaler = preference.getBoolean(getString(R.string.key_pre_pay_saler),true);
         isPayByHID = preference.getBoolean(getString(R.string.key_pre_pay_self),false );
         updateSignal();
-        mUVCCameraView = (SurfaceView)findViewById(R.id.camera_surface_view);
-        mUVCCameraView.getHolder().addCallback(mSurfaceViewCallback);
 
-        int ret = DecodeEngine.getInstance().init(true,true);
-        if(ret!=0){
-            String msg = null;
-            switch(ret){
-                case 1:
-                    msg = "初始化失败";
-                    break;
-                case 2:
-                    msg = "已经初始化过";
-                    break;
-                case 3:
-                    msg = "license激活失败";
-                    break;
-            }
-
-        }
         scanLayout.post(new Runnable() {
             @Override
             public void run() {
@@ -337,143 +235,6 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
         scanLayout.setVisibility(View.GONE);
     }
 
-    private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() {
-        @Override
-        public void onAttach(final UsbDevice device) {
-        }
-
-        @Override
-        public void onConnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock, final boolean createNew) {
-            synchronized (mSync) {
-                if (mUVCCamera != null) {
-                    mUVCCamera.destroy();
-                }
-                isActive = isPreview = false;
-            }
-            queueEvent(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (mSync) {
-                        final UVCCamera camera = new UVCCamera();
-                        try {
-                            camera.open(ctrlBlock);
-//                            camera.getValue(UVCCamera.PU_BACKLIGHT);
-                            camera.setPreviewSize(UVCCamera.DEFAULT_PREVIEW_WIDTH, UVCCamera.DEFAULT_PREVIEW_HEIGHT, UVCCamera.FRAME_FORMAT_MJPEG);
-                        } catch (final Exception e) {
-                            try {
-                                // fallback to YUV mode
-                                camera.setPreviewSize(UVCCamera.DEFAULT_PREVIEW_WIDTH, UVCCamera.DEFAULT_PREVIEW_HEIGHT, UVCCamera.DEFAULT_PREVIEW_MODE);
-                            } catch (final IllegalArgumentException e1) {
-                                camera.destroy();
-                                return;
-                            }
-                        }
-                        mPreviewSurface = mUVCCameraView.getHolder().getSurface();
-                        if (mPreviewSurface != null) {
-                            isActive = true;
-                            camera.setPreviewDisplay(mPreviewSurface);
-                            camera.startPreview();
-                            isPreview = true;
-                        }
-                        synchronized (mSync) {
-                            mUVCCamera = camera;
-                            //打开摄像头将摄像头设置为扫码模式
-                            setScanMode();
-                            mUVCCamera.setFrameCallback(new IFrameCallback() {
-                                @Override
-                                public void onFrame(ByteBuffer frame) {
-                                    String resultTextString = null;
-                                    try {
-                                        byte[] b = new byte[frame.remaining()];
-                                        frame.get(b, 0, b.length);
-                                        resultTextString = DecodeEngine.getInstance().decode(b, UVCCamera.DEFAULT_PREVIEW_WIDTH, UVCCamera.DEFAULT_PREVIEW_HEIGHT);
-//										SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddHHmmss");
-//										Util.saveDataToFile(b,"lincb",dateFormat.format(new Date())+".jpeg");
-
-//										saveBitmap(b,UVCCamera.DEFAULT_PREVIEW_WIDTH,UVCCamera.DEFAULT_PREVIEW_HEIGHT);
-                                        Log.d("lincb","扫码结果 = "+resultTextString);
-                                        if (!TextUtils.isEmpty(resultTextString)){
-                                            if(ScanDecoderParameter.getBeepMode()==ScanDecoderParameter.USE_SPEAKER){
-                                                beepManager.playBeepSoundAndVibrate();
-                                            }
-                                            Log.d("lincb","扫码结果 = "+resultTextString);
-//											stringBuffer.append(resultTextString+"\n");
-                                            Message message = new Message();
-                                            message.obj = resultTextString.toString()+"\r\n";
-                                            handler.sendMessage(message);
-                                        }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }, UVCCamera.PIXEL_FORMAT_YUV420SP);
-                        }
-                    }
-                }
-            }, 0);
-
-        }
-
-        @Override
-        public void onDisconnect(final UsbDevice device, final USBMonitor.UsbControlBlock ctrlBlock) {
-            // XXX you should check whether the comming device equal to camera device that currently using
-            queueEvent(new Runnable() {
-                @Override
-                public void run() {
-                    synchronized (mSync) {
-                        if (mUVCCamera != null) {
-                            mUVCCamera.close();
-                            if (mPreviewSurface != null) {
-                                mPreviewSurface.release();
-                                mPreviewSurface = null;
-                            }
-                            isActive = isPreview = false;
-                        }
-                    }
-                }
-            }, 0);
-        }
-
-        @Override
-        public void onDettach(final UsbDevice device) {
-            Toast.makeText(F8BaseCameraActivity.this, "USB_DEVICE_DETACHED", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onCancel(final UsbDevice device) {
-
-        }
-    };
-
-    private final SurfaceHolder.Callback mSurfaceViewCallback = new SurfaceHolder.Callback() {
-        @Override
-        public void surfaceCreated(final SurfaceHolder holder) {
-        }
-
-        @Override
-        public void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height) {
-            if ((width == 0) || (height == 0)) return;
-            mPreviewSurface = holder.getSurface();
-            synchronized (mSync) {
-                if (isActive && !isPreview && (mUVCCamera != null)) {
-                    mUVCCamera.setPreviewDisplay(mPreviewSurface);
-                    mUVCCamera.startPreview();
-                    isPreview = true;
-                }
-            }
-        }
-
-        @Override
-        public void surfaceDestroyed(final SurfaceHolder holder) {
-            synchronized (mSync) {
-                if (mUVCCamera != null) {
-                    mUVCCamera.stopPreview();
-                }
-                isPreview = false;
-            }
-            mPreviewSurface = null;
-        }
-    };
 
     public void closeCamera(){
 //        new Thread(new ExitRunnable()).start();
@@ -500,12 +261,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 
     @Override
     protected synchronized void onDestroy() {
-        synchronized (mSync){
-            if (mUSBMonitor != null) {
-                mUSBMonitor.destroy();
-                mUSBMonitor = null;
-            }
-        }
+
         super.onDestroy();
     }
 
@@ -518,10 +274,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
         // 合成前可以修改参数：
         // Map<String, String> params = getParams();
         // synthesizer.setParams(params);
-        if (mySyntherizer!=null){
-            int result = mySyntherizer.speak(text);
-            checkResult(result, "speak");
-        }
+        TTSUtils.speak(text);
 
     }
 
@@ -655,13 +408,11 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
                         @Override
                         public void onResponse(okhttp3.Call call, Response response) throws IOException {
                             try {
-//                                showMes("onFailure | getAuthInfo ");
                                 progressDialog.dismiss();
-                                //0eqswg1dJXrl/1YcqZOTb9yOQsEzRNSjKlFMILZsoxwEn8zZyKxwU79DlnOLc/A55uvSz60lvmR0oDMMdjxuUnlxJRcz4h8YEI16NbTNrKFzxC5CXeLgMIaeOF7eL31o2DRqMg/0NRkCHkZf3pIKqfybNTQ3yL7+LzuDBPBENI572M1S3M4Aoz4dlnqAk9OmpCBuTYpD2lAuxlhDNTKqjlFvLWwJCVo3Xc/I6nj7OIIR2pt8YOwOYoMsTslpDtDU0nMvSN/Yk9mpTxMgZctRdTE7YRU6h0668FClzGfHrO3ZYO55rkeabsWSm/4lxFkWW4jIaw1Op0bVQeTxeTDNgX2HGTC2V/fuKEU1PjX/EfETCJdkKBLJwe6yg35OBxjcEiyIuz319aYLOfvyMx51qE5kF0/fx8XCfv5PZcd22v2g48NXZjyeojWcoLjmdgAxk9Z68rPTJBApVFFenzPecbZwqZsSkZDmYPW1OhskDRv5NRuZ5yqV8sgPZgNZXy2kErRZ+R7D93zrMDAFg0dRWyZWxnXs8bkmoFQFnW1uv5LrjnbpYDUhjvHDh2cIgrRzJHMB0Ecei36ehSSyG8o739mngwfQNigSf7W4YfG2TSNjggcnjkJvagoMXMkbgLQ=
                                 mAuthInfo = ReturnXMLParser.parseGetAuthInfoXML(response.body().byteStream());
                                 //获取人脸SDK调用凭证成功
                                 HashMap params = new HashMap();
-                                params.put(WxFacePayData.PARAMS_FACE_AUTHTYPE, "FACEPAY_DELAY");
+                                params.put(WxFacePayData.PARAMS_FACE_AUTHTYPE, "FACEPAY");
                                 params.put(WxFacePayData.PARAMS_APPID, WxFacePayData.WECHAT_APP_ID_TEST);
                                 params.put(WxFacePayData.PARAMS_MCH_ID, WxFacePayData.WECHAT_MCH_ID_TEST);
                                 params.put(WxFacePayData.PARAMS_STORE_ID, WxFacePayData.WECHAT_STORE_ID_TEST);
@@ -687,7 +438,7 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 //                                params_delay.put(WxFacePayData.PARAMS_AUTHINFO, mAuthInfo);
 //                                params_delay.put("sub_mch_id", "1487696602");
 
-                                params.put(WxFacePayData.PARAMS_IGNORE_PAY_RESULT,"1");
+                                params.put(WxFacePayData.PARAMS_IGNORE_PAY_RESULT,"0");
                                 WxPayFace.getInstance().getWxpayfaceCode(params, new IWxPayfaceCallback() {
                                     @Override
                                     public void response(Map info) throws RemoteException {
@@ -958,35 +709,9 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
 
     private void checkResult(int result, String method) {
         if (result != 0) {
-            LogUtils.i("lincb","error code :" + result + " method:" + method + ", 错误码文档:http://yuyin.baidu.com/docs/tts/122 ");
         }
     }
 
-    /**
-     * 设置微信扫码模式
-     */
-    public void setScanMode(){
-        if (mUVCCamera!=null){
-            mUVCCamera.updateCameraParams();
-            mUVCCamera.setValue(UVCCamera.PU_BACKLIGHT,100);
-        }
-    }
-
-    /**
-     *  设置微信刷脸模式
-     */
-    public void setFaceMode(){
-//        try{
-//            if (mUVCCamera!=null){
-//                mUVCCamera.updateCameraParams();
-//                mUVCCamera.setValue(UVCCamera.PU_BACKLIGHT,50);
-//            }
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-
-
-    }
 
     public void releaseWxFace(){
 //        Log.d("lincb","releaseWxFace");
@@ -1004,166 +729,5 @@ public class F8BaseCameraActivity extends com.serenegiant.common.BaseActivity im
             usbHidDevice = null;
         }
     }
-    protected MyHandler MainHandler = new MyHandler(this);
 
-    protected class MainListener implements ImiDevice.OpenDeviceListener{
-
-        @Override
-        public void onOpenDeviceSuccess() {
-            //open device success.
-            Log.d("lincb","打开摄像头成功");
-
-            mDeviceAttribute = mDevice.getAttribute();
-            mDevice.setProperty(ImiPropertIds.IMI_CAM_PROPERTY_COLOR_BACKLIGHT_COMPENSATION,2);
-            MainHandler.sendEmptyMessage(DEVICE_OPEN_SUCCESS);
-        }
-
-        @Override
-        public void onOpenDeviceFailed(String errorMsg) {
-            //open device falied.
-            MainHandler.sendMessage(MainHandler.obtainMessage(DEVICE_OPEN_FALIED, errorMsg));
-        }
-    }
-
-    protected  class MyHandler extends Handler {
-        WeakReference<F8BaseCameraActivity> mActivity;
-        public MyHandler(F8BaseCameraActivity activity) {
-            mActivity = new WeakReference<F8BaseCameraActivity>(activity);
-        }
-        @Override
-        public void handleMessage(Message msg) {
-            F8BaseCameraActivity mainActivity = mActivity.get();
-            switch (msg.what)
-            {
-                case DEVICE_OPEN_FALIED:
-                    ToastUtil.toast("摄像头被占用无法打开。");
-                    break;
-                case DEVICE_DISCONNECT:
-                    break;
-                case DEVICE_OPEN_SUCCESS:
-                    mainActivity.runViewer();
-                    break;
-                case MSG_EXIT:
-                    mainActivity.Exit();
-                    break;
-            }
-        }
-    }
-    private ReentrantLock reentrantLock = new ReentrantLock();
-    protected void runViewer() {
-        Log.d("lincb","runViewer扫码开启 = "+isCanScan);
-        mViewer = new SimpleViewer(mDevice, ImiFrameType.COLOR);
-        mViewer.setOnGetFrameResult(new SimpleViewer.OnGetFrameResult() {
-            @Override
-            public void onFrame(final ByteBuffer byteBuffer) {
-                try {
-                    reentrantLock.lock();
-                    if (isCanScan){
-                        int len = byteBuffer.capacity();
-                        byte[] yuv = new byte[len];
-                        byteBuffer.get(yuv);
-                        yuv = LdBitmapFactory.createYUVData(yuv,CAMERA_PREVIEW_WIDTH,CAMERA_PREVIEW_HEIGHT);
-                        String resultTextString = DecodeEngine.getInstance().decode(yuv, CAMERA_PREVIEW_WIDTH, CAMERA_PREVIEW_HEIGHT);
-//                        Log.d("lincb","扫码结果 = "+resultTextString);
-                        if (!TextUtils.isEmpty(resultTextString)&&isCanScan){
-                            if (beepManager!=null){
-                                beepManager.playBeepSoundAndVibrate();
-                            }
-                            Log.d("lincb","扫码结果 = "+resultTextString);
-                            isCanScan = false;
-                            Message message = new Message();
-                            message.obj = resultTextString+"\r\n";
-                            message.what = MSG_DO_SCAN_PAY;
-                            handler.sendMessage(message);
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }finally {
-                    reentrantLock.unlock();
-                }
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void getFrameFail() {
-
-            }
-        });
-        switch (mCurrMode.getFormat())
-        {
-            case IMI_PIXEL_FORMAT_IMAGE_H264:
-                mDecodePanel.initDecoder(mSurface, mCurrMode.getResolutionX(),
-                        mCurrMode.getResolutionY());
-                mViewer.setDecodePanel(mDecodePanel);
-                break;
-            case IMI_PIXEL_FORMAT_IMAGE_YUV420SP:
-                ImiDevice.ImiFrame frame = mDevice.readNextFrame(ImiDevice.ImiStreamType.COLOR,0);
-                ByteBuffer byteBuffer = frame.getData();
-                String resultTextString = null;
-                try {
-                    byte[] b = new byte[byteBuffer.remaining()];
-                    byteBuffer.get(b, 0, b.length);
-                    resultTextString = DecodeEngine.getInstance().decode(b, 640, 480);
-                    if (!TextUtils.isEmpty(resultTextString)){
-                        Log.d("lincb","扫码结果 = "+resultTextString);
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            default:
-                mUVCCameraView.setVisibility(View.GONE);
-                mGLPanel.setVisibility(View.VISIBLE);
-                mViewer.setGLPanel(mGLPanel);
-                break;
-        }
-
-        mViewer.onStart();
-    }
-    private void Exit() {
-        ImiDevice.destroy();
-        ImiNect.destroy();
-        android.os.Process.killProcess(android.os.Process.myPid());
-    }
-
-    protected class OpenDeviceRunnable implements Runnable{
-
-        @Override
-        public void run() {
-            if (mDevice!=null){
-                mDevice.close();
-            }
-            ImiFrameMode frameMode = new ImiFrameMode(ImiPixelFormat.IMI_PIXEL_FORMAT_IMAGE_RGB24, CAMERA_PREVIEW_WIDTH, CAMERA_PREVIEW_HEIGHT, 30);
-            mDevice.setFrameMode(ImiDevice.ImiStreamType.COLOR, frameMode);
-            mCurrMode = frameMode;
-            Log.d("lincb","准备打开摄像头");
-            mDevice.open(F8BaseCameraActivity.this, ImiDevice.ImiStreamType.COLOR.toNative(), mainlistener);
-        }
-    }
-    protected class ExitRunnable implements Runnable {
-
-        @Override
-        public void run() {
-            if(mDevice != null) {
-                mDevice.setProperty(ImiPropertIds.IMI_CAM_PROPERTY_COLOR_BACKLIGHT_COMPENSATION,1);
-                mDevice.close();
-                Log.d("lincb","close camera");
-            }
-        }
-    }
-
-
-    /**
-     * 释放扫码摄像头
-     */
-    public void releaseScanCamera(){
-//        new Thread(new ExitRunnable()).start();
-
-    }
 }

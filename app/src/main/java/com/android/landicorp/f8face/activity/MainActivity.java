@@ -7,7 +7,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Surface;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -65,7 +64,6 @@ public class MainActivity extends F8BaseCameraActivity implements View.OnClickLi
         scanLayout.setOnClickListener(this);
         faceScanLayout = (LinearLayout)findViewById(R.id.ll_face_scan);
         faceScanLayout.setOnClickListener(this);
-        mUVCCameraView = (SurfaceView)findViewById(R.id.camera_surface_view);
 
     }
 
